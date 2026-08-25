@@ -25,7 +25,7 @@
     <Target
         Name="AutomateFrontendTypeGen"
         AfterTargets="Build"
-        Condition="'$(Configuration)' == 'Debug' And '$(IsTestProject)' != 'true' And !$(MSBuildProjectName.EndsWith('Tests'))"
+        Condition="'$(Configuration)' == 'Debug' And '$(ContinuousIntegrationBuild)' != 'true' And '$(DotNetWatchBuild)' != 'true' And '$(IsTestProject)' != 'true' And '$(BuildingForLiveUnitTesting)' != 'true'"
     >
         <Message Importance="high" Text="🚀 .NET Build Hook: Automating @hey-api/openapi-ts..." />
         <Exec WorkingDirectory="../client" Command="npm run clientGen" ContinueOnError="false" />
