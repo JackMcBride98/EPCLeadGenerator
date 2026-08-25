@@ -10,7 +10,7 @@ class Program
         var connectionString =
             args.FirstOrDefault()
             ?? Environment.GetEnvironmentVariable("Database__ConnectionString")
-            ?? "Host=localhost;Port=5433;Database=EPCLeadGenerator;Username=postgres;Password=mysecretpassword";
+            ?? "Host=localhost;Port=5434;Database=EPCLeadGenerator;Username=postgres;Password=mysecretpassword";
 
         bool shouldDrop = args.Contains("--drop") || args.Contains("--reset");
 

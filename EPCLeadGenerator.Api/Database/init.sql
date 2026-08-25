@@ -1,1 +1,1 @@
-CREATE DATABASE "EPCLeadGeneratorDatabase";
+CREATE DATABASE "EPCLeadGenerator";

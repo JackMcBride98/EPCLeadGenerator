@@ -45,9 +45,9 @@ public class BuildContext : FrostingContext
         DbUpProjectPath = "../EPCLeadGenerator.Database/EPCLeadGenerator.Database.csproj";
         DbDirectoryPath = "../EPCLeadGenerator.Database";
         LocalDbConnectionString =
-            "Host=localhost;Port=5433;Database=EPCLeadGenerator;Username=postgres;Password=mysecretpassword";
+            "Host=localhost;Port=5434;Database=EPCLeadGenerator;Username=postgres;Password=mysecretpassword";
         LocalTestDbConnectionString =
-            "Host=localhost;Port=5434;Database=EPCLeadGeneratorTest;Username=postgres;Password=mysecretpassword";
+            "Host=localhost;Port=5435;Database=EPCLeadGeneratorTest;Username=postgres;Password=mysecretpassword";
         ApiProjectDirectoryPath = "../EPCLeadGenerator.Api";
         ApiProjectPath = ApiProjectDirectoryPath + "/EPCLeadGenerator.Api.csproj";
         ClientDirectoryPath = "../client";
