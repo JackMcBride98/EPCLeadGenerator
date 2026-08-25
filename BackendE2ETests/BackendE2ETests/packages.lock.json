@@ -869,10 +869,10 @@
         "type": "Project",
         "dependencies": {
           "Bogus": "[35.6.5, )",
-          "JackTemplate.Api": "[1.0.0, )"
+          "EPCLeadGenerator.Api": "[1.0.0, )"
         }
       },
-      "jacktemplate.api": {
+      "epcleadgenerator.api": {
         "type": "Project",
         "dependencies": {
           "FastEndpoints": "[8.2.0, )",

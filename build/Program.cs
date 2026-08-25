@@ -42,14 +42,14 @@ public class BuildContext : FrostingContext
         : base(context)
     {
         Delay = context.Arguments.HasArgument("delay");
-        DbUpProjectPath = "../JackTemplate.Database/JackTemplate.Database.csproj";
-        DbDirectoryPath = "../JackTemplate.Database";
+        DbUpProjectPath = "../EPCLeadGenerator.Database/EPCLeadGenerator.Database.csproj";
+        DbDirectoryPath = "../EPCLeadGenerator.Database";
         LocalDbConnectionString =
             "Host=localhost;Port=5433;Database=JackTemplate;Username=postgres;Password=mysecretpassword";
         LocalTestDbConnectionString =
             "Host=localhost;Port=5434;Database=JackTemplateTest;Username=postgres;Password=mysecretpassword";
-        ApiProjectDirectoryPath = "../JackTemplate.Api";
-        ApiProjectPath = ApiProjectDirectoryPath + "/JackTemplate.Api.csproj";
+        ApiProjectDirectoryPath = "../EPCLeadGenerator.Api";
+        ApiProjectPath = ApiProjectDirectoryPath + "/EPCLeadGenerator.Api.csproj";
         ClientDirectoryPath = "../client";
         BackendE2ETestsProjectPath = "../BackendE2ETests/BackendE2ETests/BackendE2ETests.csproj";
         BuildersProjectPath = "../Builders/Builders.csproj";

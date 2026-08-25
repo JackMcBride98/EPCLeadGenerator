@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\JackTemplate.Api\JackTemplate.Api.csproj" />
+        <ProjectReference Include="..\..\EPCLeadGenerator.Api\EPCLeadGenerator.Api.csproj" />
         <ProjectReference Include="..\..\Builders\Builders.csproj" />
     </ItemGroup>
 </Project>

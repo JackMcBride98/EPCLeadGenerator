@@ -314,7 +314,7 @@
           "NCrontab": "3.3.0"
         }
       },
-      "jacktemplate.api": {
+      "epcleadgenerator.api": {
         "type": "Project",
         "dependencies": {
           "FastEndpoints": "[8.2.0, )",

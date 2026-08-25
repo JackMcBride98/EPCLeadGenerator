@@ -1,7 +1,6 @@
 <Solution>
     <Project Path="Builders/Builders.csproj" />
-    <Project Path="JackTemplate.Api/JackTemplate.Api.csproj" />
-    <Project Path="JackTemplate.Database/JackTemplate.Database.csproj" />
+    <Project Path="EPCLeadGenerator.Api/EPCLeadGenerator.Api.csproj" />
     <Folder Name="/infrastructure/">
         <File Path="infrastructure/.gitignore" />
     </Folder>
@@ -10,4 +9,5 @@
     <Project Path="build/Build.csproj" />
 
     <Folder Name="/client/" />
+    <Project Path="EPCLeadGenerator.Database/EPCLeadGenerator.Database.csproj" />
 </Solution>
