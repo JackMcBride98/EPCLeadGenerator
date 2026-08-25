@@ -1,10 +1,10 @@
-using JackTemplate.Api.Configuration;
-using JackTemplate.Api.Database;
-using JackTemplate.Api.Services;
+using EPCLeadGenerator.Api.Configuration;
+using EPCLeadGenerator.Api.Database;
+using EPCLeadGenerator.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace JackTemplate.Api.Features.User;
+namespace EPCLeadGenerator.Api.Features.User;
 
 public class GetUser
 {

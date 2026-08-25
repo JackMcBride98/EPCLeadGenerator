@@ -1,5 +1,5 @@
 ﻿using Builders;
-using JackTemplate.Api.Features.User;
+using EPCLeadGenerator.Api.Features.User;
 using NodaTime;
 using NSubstitute;
 

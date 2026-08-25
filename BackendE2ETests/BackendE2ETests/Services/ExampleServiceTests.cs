@@ -1,4 +1,4 @@
-﻿using JackTemplate.Api.Services;
+﻿using EPCLeadGenerator.Api.Services;
 
 namespace Tests.Services;
 

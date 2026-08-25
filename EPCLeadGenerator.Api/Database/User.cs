@@ -2,7 +2,7 @@
 using NodaTime;
 using NodaTime.Extensions;
 
-namespace JackTemplate.Api.Database;
+namespace EPCLeadGenerator.Api.Database;
 
 public class User(string userId, string name)
 {

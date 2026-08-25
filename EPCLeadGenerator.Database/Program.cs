@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using DbUp;
 
-namespace JackTemplate.Database;
+namespace EPCLeadGenerator.Database;
 
 class Program
 {
@@ -10,7 +10,7 @@ class Program
         var connectionString =
             args.FirstOrDefault()
             ?? Environment.GetEnvironmentVariable("Database__ConnectionString")
-            ?? "Host=localhost;Port=5433;Database=JackTemplate;Username=postgres;Password=mysecretpassword";
+            ?? "Host=localhost;Port=5433;Database=EPCLeadGenerator;Username=postgres;Password=mysecretpassword";
 
         bool shouldDrop = args.Contains("--drop") || args.Contains("--reset");
 

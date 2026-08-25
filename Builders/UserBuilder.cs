@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using JackTemplate.Api.Database;
+using EPCLeadGenerator.Api.Database;
 using NodaTime;
 using NodaTime.Extensions;
 

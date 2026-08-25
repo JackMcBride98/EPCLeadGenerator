@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace JackTemplate.Api.Configuration;
+namespace EPCLeadGenerator.Api.Configuration;
 
 public class ExampleOptions
 {

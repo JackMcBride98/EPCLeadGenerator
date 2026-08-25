@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace JackTemplate.Api.Database;
+namespace EPCLeadGenerator.Api.Database;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {

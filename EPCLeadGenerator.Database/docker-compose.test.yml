@@ -3,7 +3,7 @@ name: jack-template-test
 services:
   db:
     image: postgres
-    container_name: jack-template-test-db
+    container_name: epc-lead-generator-test-db
     restart: always
     environment:
       POSTGRES_PASSWORD: mysecretpassword
