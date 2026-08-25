@@ -1,0 +1,165 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "GetDocument.Insider API",
+    "version": "v1.0.0"
+  },
+  "paths": {
+    "/api/profile": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "operationId": "GetUser",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetUser_Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GetUser_Response": {
+        "required": [
+          "user"
+        ],
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/GetUser_UserResponse"
+          }
+        }
+      },
+      "GetUser_UserResponse": {
+        "required": [
+          "userId",
+          "name",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.1"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "default": "One or more validation errors occurred."
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "default": 400
+          },
+          "instance": {
+            "type": "string",
+            "default": "/api/route"
+          },
+          "traceId": {
+            "type": "string",
+            "default": "0HMPNHL0JHL76:00000001"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "the details of the error"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "the name of the error or property of the dto that caused the error",
+                  "default": "Error or field name"
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "the reason for the error",
+                  "default": "Error reason"
+                },
+                "code": {
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "description": "the code of the error"
+                },
+                "severity": {
+                  "type": [
+                    "null",
+                    "string"
+                  ],
+                  "description": "the severity of the error"
+                }
+              },
+              "description": "the error details object"
+            }
+          }
+        },
+        "description": "RFC9457 compatible problem details/ error response class. this can be used by configuring startup like so:\n```app.UseFastEndpoints(c =&gt; c.Errors.UseProblemDetails())```"
+      }
+    },
+    "securitySchemes": {
+      "JWTBearerAuth": {
+        "type": "http",
+        "description": "Enter a JWT token to authorize the requests...",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

@@ -1,0 +1,237 @@
+---
+name: Pull Request Checks
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  frontend-lint:
+    name: Frontend Lint & Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: client
+
+      - name: Run Frontend Linter (ESLint)
+        run: npm run lint
+        working-directory: client
+      - name: Run Frontend Format Check (Prettier)
+        run: npm run format:check
+        working-directory: client
+
+  frontend-typecheck:
+    name: Frontend Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: client
+      - name: Run Frontend Typecheck (TypeScript)
+        run: npm run typecheck
+        working-directory: client
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '26'
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: client
+      - name: Run Frontend Tests (Vitetest)
+        run: npm run test
+        working-directory: client
+
+  lint-backend:
+    name: Lint & Format Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Install yamllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y yamllint
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Restore Local Tools
+        shell: bash
+        run: dotnet tool restore
+      - name: Run Backend Linter
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: LintBackend
+          verbosity: Normal
+
+  build:
+    name: Build Solution
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Install Frontend Dependencies
+        run: npm ci
+        working-directory: client
+      - name: Run Cake Build Task
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: Build
+          verbosity: Normal
+      - name: Run API/Frontend Generation Verification
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: CheckFrontendApiClientGenCommitted
+          verbosity: Diagnostic
+          arguments: |
+            exclusive: true
+      - name: Upload Compiled Binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-binaries
+          path: |
+            **/bin/
+            **/obj/
+          retention-days: 1
+
+  test:
+    name: Backend E2E Tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+          cache: true
+          cache-dependency-path: '**/packages.lock.json'
+      - name: Download Compiled Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: compiled-binaries
+      - name: Restore Executable Permissions
+        run: |
+          echo "Restoring execute permissions to compiled binaries..."
+          find . -type f -path "*/bin/*" ! -name "*.*" -exec chmod +x {} +
+      - name: Start Test Database Container
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: CreateTestDatabase
+          verbosity: Normal
+          arguments: |
+            exclusive: true
+      - name: Migrate Test Database
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: MigrateTestDatabase
+          verbosity: Normal
+          arguments: |
+            exclusive: true
+      - name: Run E2E Integration Tests
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: RunBackendE2ETests
+          verbosity: Normal
+          arguments: |
+            exclusive: true
+      - name: Clean up Test Database
+        if: always()
+        uses: cake-build/cake-action@v3
+        with:
+          project-path: build/Build.csproj
+          target: DestroyTestDatabase
+          verbosity: Normal
+
+  # Detect if infrastructure files changed
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Filter Infrastructure Changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            infra:
+              - 'infrastructure/**'
+
+  infra-plan:
+    name: OpenTofu Plan & Verify
+    runs-on: ubuntu-latest
+    needs: changes
+    if: false && needs.changes.outputs.infra == 'true' # No longer deploying on AWS so not needed
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::687979656894:role/playlist-search-tool-github-actions-role
+          aws-region: eu-west-2
+
+      - name: Run OpenTofu Plan
+        uses: dflook/tofu-plan@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path: ./infrastructure
+          variables: |
+            spotify_client_id     = "${{ secrets.SPOTIFY_CLIENT_ID }}"
+            spotify_client_secret = "${{ secrets.SPOTIFY_CLIENT_SECRET }}"
+            spotify_redirect_uri  = "${{ secrets.SPOTIFY_REDIRECT_URI }}"
+            db_name               = "${{ secrets.DB_NAME }}"
+            db_username           = "${{ secrets.DB_USERNAME }}"
+            db_password           = "${{ secrets.DB_PASSWORD }}"
+            db_port               = "${{ secrets.DB_PORT }}"

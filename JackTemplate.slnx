@@ -1,0 +1,13 @@
+<Solution>
+    <Project Path="Builders/Builders.csproj" />
+    <Project Path="JackTemplate.Api/JackTemplate.Api.csproj" />
+    <Project Path="JackTemplate.Database/JackTemplate.Database.csproj" />
+    <Folder Name="/infrastructure/">
+        <File Path="infrastructure/.gitignore" />
+    </Folder>
+    <Folder Name="/Solution Items/" />
+    <Project Path="BackendE2ETests/BackendE2ETests/BackendE2ETests.csproj" />
+    <Project Path="build/Build.csproj" />
+
+    <Folder Name="/client/" />
+</Solution>

@@ -1,0 +1,6 @@
+CREATE TABLE "Users" (
+    "UserId" VARCHAR(100) NOT NULL,
+    "CreatedAt" TIMESTAMPTZ NULL,
+    "Name" VARCHAR(5000) NOT NULL,
+    CONSTRAINT "PK_Users" PRIMARY KEY ("UserId")
+);

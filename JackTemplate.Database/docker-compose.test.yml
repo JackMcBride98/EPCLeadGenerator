@@ -1,0 +1,11 @@
+---
+name: jack-template-test
+services:
+  db:
+    image: postgres
+    container_name: jack-template-test-db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+    volumes: [./init.sql:/docker-entrypoint-initdb.d/init.sql]
+    ports: [5434:5432]

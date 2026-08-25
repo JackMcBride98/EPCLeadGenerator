@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>JackTemplate.Api</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <!-- 
+      Enable OpenAPI document generation ONLY for local Debug builds.
+      Explicitly exclude CI environments (where continuous integration or build servers run),
+      tests, live unit testing, and dotnet watch builds.
+    -->
+        <OpenApiGenerateDocumentsOnBuild
+            Condition="'$(Configuration)' == 'Debug' And '$(ContinuousIntegrationBuild)' != 'true' And '$(DotNetWatchBuild)' != 'true' And '$(IsTestProject)' != 'true' And '$(BuildingForLiveUnitTesting)' != 'true'"
+            >true</OpenApiGenerateDocumentsOnBuild>
+        <OpenApiGenerateDocumentsOnBuild Condition="'$(OpenApiGenerateDocumentsOnBuild)' == ''"
+            >false</OpenApiGenerateDocumentsOnBuild>
+
+        <OpenApiGenerateDocumentsOptions>--file-name swagger</OpenApiGenerateDocumentsOptions>
+        <OpenApiDocumentsDirectory>../client/api/</OpenApiDocumentsDirectory>
+    </PropertyGroup>
+
+    <Target
+        Name="AutomateFrontendTypeGen"
+        AfterTargets="Build"
+        Condition="'$(Configuration)' == 'Debug' And '$(IsTestProject)' != 'true' And !$(MSBuildProjectName.EndsWith('Tests'))"
+    >
+        <Message Importance="high" Text="🚀 .NET Build Hook: Automating @hey-api/openapi-ts..." />
+        <Exec WorkingDirectory="../client" Command="npm run clientGen" ContinueOnError="false" />
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="FastEndpoints" Version="8.2.0" />
+        <PackageReference Include="FastEndpoints.OpenApi" Version="8.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+        <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="10.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
+        <PackageReference
+            Include="Microsoft.Extensions.ApiDescription.Server"
+            Version="10.0.0-preview.*"
+        >
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2" />
+        <PackageReference
+            Include="Npgsql.EntityFrameworkCore.PostgreSQL.NodaTime"
+            Version="10.0.2"
+        />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.16.15" />
+        <PackageReference Include="TickerQ" Version="10.4.0" />
+    </ItemGroup>
+</Project>
