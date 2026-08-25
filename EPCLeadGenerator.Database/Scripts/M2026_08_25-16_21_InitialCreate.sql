@@ -28,12 +28,12 @@ CREATE INDEX "IdxPostcodesLSOACode" ON "Postcodes"("LSOACode");
 
 
 CREATE TABLE "EPCAssessments" (
-    "Id" SERIAL PRIMARY KEY,
+    "EPCAssessmentId" SERIAL PRIMARY KEY,
     "Postcode" VARCHAR(10) NOT NULL,
-    "AddressLine" TEXT NOT NULL,
+    "AddressLine" VARCHAR(1000) NOT NULL,
     "EPCRating" VARCHAR(2) CHECK ("EPCRating" IN ('A', 'B', 'C', 'D', 'E', 'F', 'G')),
     "IsExpired" BOOLEAN NOT NULL DEFAULT FALSE,
-    "EPCUploadedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "UpdatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "FkEPCPostcode" FOREIGN KEY ("Postcode")
         REFERENCES "Postcodes"("Postcode")
 );

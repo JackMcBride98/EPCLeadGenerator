@@ -4,12 +4,12 @@ namespace EPCLeadGenerator.Api.Database;
 
 public class DataContext(DbContextOptions<DataContext> options) : DbContext(options)
 {
-    public DbSet<User> Users { get; set; }
+    public DbSet<LSOADeprivation> LSOADeprivation { get; set; }
+    public DbSet<Postcode> Postcodes { get; set; }
+    public DbSet<EPCAssessment> EPCAssessments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        // Add on model creating logic here, e.g. configuring relationships, indexes, etc.
     }
 }

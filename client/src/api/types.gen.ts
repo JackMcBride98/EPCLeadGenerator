@@ -4,14 +4,21 @@ export type ClientOptions = {
   baseUrl: `${string}://${string}` | (string & {});
 };
 
-export type GetUserResponse = {
-  user: GetUserUserResponse;
+export type GetPostcodeDeprivationPostcodeDeprivationResponse = {
+  postcode: string;
+  markAsDone: boolean;
+  lsoaCode: null | string;
+  lsoaName: null | string;
+  multipleDeprivationPercentage: null | number;
+  multipleDeprivationDecile: null | number;
 };
 
-export type GetUserUserResponse = {
-  userId: string;
-  name: string;
-  createdAt: string;
+export type GetPostcodeDeprivationRequest = {
+  postcode: string;
+};
+
+export type GetPostcodeDeprivationResponse = {
+  data: GetPostcodeDeprivationPostcodeDeprivationResponse | null;
 };
 
 /**
@@ -48,14 +55,14 @@ export type ProblemDetails = {
   }>;
 };
 
-export type GetUserData = {
-  body?: never;
+export type GetPostcodeDeprivationData = {
+  body: GetPostcodeDeprivationRequest;
   path?: never;
   query?: never;
-  url: "/api/profile";
+  url: "/api/postcodes/lookup";
 };
 
-export type GetUserErrors = {
+export type GetPostcodeDeprivationErrors = {
   /**
    * Not Found
    */
@@ -66,13 +73,15 @@ export type GetUserErrors = {
   500: ProblemDetails;
 };
 
-export type GetUserError = GetUserErrors[keyof GetUserErrors];
+export type GetPostcodeDeprivationError =
+  GetPostcodeDeprivationErrors[keyof GetPostcodeDeprivationErrors];
 
-export type GetUserResponses = {
+export type GetPostcodeDeprivationResponses = {
   /**
    * Success
    */
-  200: GetUserResponse;
+  200: GetPostcodeDeprivationResponse;
 };
 
-export type GetUserResponse2 = GetUserResponses[keyof GetUserResponses];
+export type GetPostcodeDeprivationResponse2 =
+  GetPostcodeDeprivationResponses[keyof GetPostcodeDeprivationResponses];
