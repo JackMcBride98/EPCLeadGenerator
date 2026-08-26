@@ -64,13 +64,17 @@ export type GetPostcodeDeprivationData = {
 
 export type GetPostcodeDeprivationErrors = {
   /**
-   * Not Found
+   * The requested resource was not found.
    */
   404: ProblemDetails;
   /**
    * Server Error
    */
   500: ProblemDetails;
+  /**
+   * An upstream service gateway error occurred.
+   */
+  502: ProblemDetails;
 };
 
 export type GetPostcodeDeprivationError =
@@ -78,7 +82,7 @@ export type GetPostcodeDeprivationError =
 
 export type GetPostcodeDeprivationResponses = {
   /**
-   * Success
+   * The request was successful.
    */
   200: GetPostcodeDeprivationResponse;
 };

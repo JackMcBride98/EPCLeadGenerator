@@ -23,7 +23,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "The request was successful.",
             "content": {
               "application/json": {
                 "schema": {
@@ -33,7 +33,7 @@
             }
           },
           "404": {
-            "description": "Not Found",
+            "description": "The requested resource was not found.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -44,6 +44,16 @@
           },
           "500": {
             "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "An upstream service gateway error occurred.",
             "content": {
               "application/problem+json": {
                 "schema": {

@@ -5,7 +5,9 @@ using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.Format;
+using Cake.Common.Tools.DotNet.MSBuild;
 using Cake.Common.Tools.DotNet.Publish;
 using Cake.Common.Tools.DotNet.Run;
 using Cake.Common.Tools.DotNet.Test;
@@ -37,6 +39,7 @@ public class BuildContext : FrostingContext
     public string ClientDirectoryPath { get; }
     public string BackendE2ETestsProjectPath { get; }
     public string BuildersProjectPath { get; }
+    public string Target { get; }
 
     public BuildContext(ICakeContext context)
         : base(context)
@@ -53,6 +56,7 @@ public class BuildContext : FrostingContext
         ClientDirectoryPath = "../client";
         BackendE2ETestsProjectPath = "../BackendE2ETests/BackendE2ETests/BackendE2ETests.csproj";
         BuildersProjectPath = "../Builders/Builders.csproj";
+        Target = context.Arguments.GetArgument("target") ?? string.Empty;
     }
 }
 
@@ -182,9 +186,51 @@ public sealed class BuildTask : FrostingTask<BuildContext>
     {
         context.Information("Building solution...");
         context.DotNetBuild(context.DbUpProjectPath);
-        context.DotNetBuild(context.ApiProjectPath);
+        // Check if the current target is CI, the verification task, or explicitly requested
+        bool isCiOrVerification =
+            context.Target.Equals("CI", StringComparison.OrdinalIgnoreCase)
+            || context.Target.Equals(
+                "CheckFrontendApiClientGenCommitted",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+        var buildSettings = new DotNetBuildSettings();
+
+        if (isCiOrVerification)
+        {
+            context.Information(
+                "-> Enabling API client generation for build (CI/Verification mode active)."
+            );
+            buildSettings.MSBuildSettings = new DotNetMSBuildSettings().WithProperty(
+                "RunApiClientGen",
+                "true"
+            );
+        }
+        else
+        {
+            context.Information("-> Skipping API client generation for faster local build.");
+        }
         context.DotNetBuild(context.BackendE2ETestsProjectPath);
         context.DotNetBuild(context.BuildersProjectPath);
+    }
+}
+
+[TaskName("RunClientGen")]
+[IsDependentOn(typeof(CleanTask))]
+public sealed class RunClientGen : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        context.Information("Running API client generation for frontend...");
+
+        var buildSettings = new DotNetBuildSettings
+        {
+            MSBuildSettings = new DotNetMSBuildSettings().WithProperty("RunApiClientGen", "true"),
+        };
+
+        context.DotNetBuild(context.ApiProjectPath, buildSettings);
+
+        context.Information("API client generation completed successfully.");
     }
 }
 

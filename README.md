@@ -47,8 +47,13 @@ Then run the backend with `dotnet watch run` and go to `http://localhost:5030/`
 
 Run the frontend by navigating to the `/client` directory and then running `npm run dev`
 
+# Api Client Gen
+We generate a swagger api file placed in the `client/api` folder, then using heyapi we generate a typescript client for the frontend to use.
+This can be done by running `./cake RunClientGen` For the clientGen to run the API must be built with an MSBuild property
+"RunApiClientGen=true". We do this as we only want it to run explicitly for the client gen task, as it is a slow process and we don't want to run it on every build.
+
 # Development
-Attach the client folder to the solution to get automcpletes
+Attach the client folder to the solution to get autocompletes
 
 # Running migrations
 Use `./cake MigrateLocalDatabase` to run the latest migrations e.g. if you have added any new ones in development
@@ -76,7 +81,6 @@ https://687979656894.signin.aws.amazon.com/console - console sign in link for pl
 who you want to be signed in with when using tofu locally.
 
 # TODO
-- Insert Table of LSOA Deprivation Data
 - Create service to encapsulate Postcode to LSOA lookup
 - Create service encapsulating Government API EPC data lookup
 - Create endpoint which returns the Deprivation and EPC data for a given postcode

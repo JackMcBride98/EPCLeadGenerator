@@ -8,8 +8,8 @@ namespace Tests;
 
 public class App : AppFixture<Program>
 {
-    public IExampleService MockExampleService { get; private set; } =
-        Substitute.For<IExampleService>();
+    public IPostcodeLookupService MockPostcodeLookupService { get; private set; } =
+        Substitute.For<IPostcodeLookupService>();
 
     public string DatabaseConnectionString =>
         Services.GetRequiredService<IConfiguration>().GetRequiredSection("Database")[
@@ -33,7 +33,7 @@ public class App : AppFixture<Program>
 
     protected override void ConfigureServices(IServiceCollection services)
     {
-        services.RemoveAll<IExampleService>();
-        services.AddSingleton(MockExampleService);
+        services.RemoveAll<IPostcodeLookupService>();
+        services.AddSingleton(MockPostcodeLookupService);
     }
 }
