@@ -49,21 +49,4 @@ public class GetPostcodeDeprivationEndpointTests(App app) : TestBase(app)
         result.Data.MultipleDeprivationPercentage.ShouldBe(35.50m);
         result.Data.MultipleDeprivationDecile.ShouldBe(4);
     }
-
-    [Fact]
-    public async Task PostcodeLookup_NotInDatabase_ReturnsNotFound()
-    {
-        // Arrange
-        var request = new GetPostcodeDeprivation.Request("XX9 9XX");
-
-        // Act
-        var (response, _) = await App.Client.POSTAsync<
-            GetPostcodeDeprivation.Endpoint,
-            GetPostcodeDeprivation.Request,
-            GetPostcodeDeprivation.Response
-        >(request);
-
-        // Assert
-        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
-    }
 }

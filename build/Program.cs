@@ -39,6 +39,7 @@ public class BuildContext : FrostingContext
     public string ClientDirectoryPath { get; }
     public string BackendE2ETestsProjectPath { get; }
     public string BuildersProjectPath { get; }
+    public string Target { get; }
 
     public BuildContext(ICakeContext context)
         : base(context)
@@ -55,6 +56,7 @@ public class BuildContext : FrostingContext
         ClientDirectoryPath = "../client";
         BackendE2ETestsProjectPath = "../BackendE2ETests/BackendE2ETests/BackendE2ETests.csproj";
         BuildersProjectPath = "../Builders/Builders.csproj";
+        Target = context.Arguments.GetArgument("target") ?? string.Empty;
     }
 }
 
@@ -184,11 +186,30 @@ public sealed class BuildTask : FrostingTask<BuildContext>
     {
         context.Information("Building solution...");
         context.DotNetBuild(context.DbUpProjectPath);
-        var buildSettings = new DotNetBuildSettings
+        // Check if the current target is CI, the verification task, or explicitly requested
+        bool isCiOrVerification =
+            context.Target.Equals("CI", StringComparison.OrdinalIgnoreCase)
+            || context.Target.Equals(
+                "CheckFrontendApiClientGenCommitted",
+                StringComparison.OrdinalIgnoreCase
+            );
+
+        var buildSettings = new DotNetBuildSettings();
+
+        if (isCiOrVerification)
         {
-            MSBuildSettings = new DotNetMSBuildSettings().WithProperty("RunApiClientGen", "true"),
-        };
-        context.DotNetBuild(context.ApiProjectPath, buildSettings);
+            context.Information(
+                "-> Enabling API client generation for build (CI/Verification mode active)."
+            );
+            buildSettings.MSBuildSettings = new DotNetMSBuildSettings().WithProperty(
+                "RunApiClientGen",
+                "true"
+            );
+        }
+        else
+        {
+            context.Information("-> Skipping API client generation for faster local build.");
+        }
         context.DotNetBuild(context.BackendE2ETestsProjectPath);
         context.DotNetBuild(context.BuildersProjectPath);
     }
