@@ -7,13 +7,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <!-- 
-      Enable OpenAPI document generation ONLY for local Debug builds.
-      Explicitly exclude CI environments (where continuous integration or build servers run),
-      tests, live unit testing, and dotnet watch builds.
-    -->
-        <OpenApiGenerateDocumentsOnBuild
-            Condition="'$(Configuration)' == 'Debug' And '$(ContinuousIntegrationBuild)' != 'true' And '$(DotNetWatchBuild)' != 'true' And '$(IsTestProject)' != 'true' And '$(BuildingForLiveUnitTesting)' != 'true'"
+        <OpenApiGenerateDocumentsOnBuild Condition="'$(RunApiClientGen)' == 'true'"
             >true</OpenApiGenerateDocumentsOnBuild>
         <OpenApiGenerateDocumentsOnBuild Condition="'$(OpenApiGenerateDocumentsOnBuild)' == ''"
             >false</OpenApiGenerateDocumentsOnBuild>
@@ -25,12 +19,11 @@
     <Target
         Name="AutomateFrontendTypeGen"
         AfterTargets="Build"
-        Condition="'$(Configuration)' == 'Debug' And '$(ContinuousIntegrationBuild)' != 'true' And '$(DotNetWatchBuild)' != 'true' And '$(IsTestProject)' != 'true' And '$(BuildingForLiveUnitTesting)' != 'true'"
+        Condition="'$(RunApiClientGen)' == 'true'"
     >
         <Message Importance="high" Text="🚀 .NET Build Hook: Automating @hey-api/openapi-ts..." />
         <Exec WorkingDirectory="../client" Command="npm run clientGen" ContinueOnError="false" />
     </Target>
-
     <ItemGroup>
         <PackageReference Include="FastEndpoints" Version="8.2.0" />
         <PackageReference Include="FastEndpoints.OpenApi" Version="8.2.0" />

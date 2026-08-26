@@ -5,7 +5,9 @@ using Cake.Common;
 using Cake.Common.Diagnostics;
 using Cake.Common.IO;
 using Cake.Common.Tools.DotNet;
+using Cake.Common.Tools.DotNet.Build;
 using Cake.Common.Tools.DotNet.Format;
+using Cake.Common.Tools.DotNet.MSBuild;
 using Cake.Common.Tools.DotNet.Publish;
 using Cake.Common.Tools.DotNet.Run;
 using Cake.Common.Tools.DotNet.Test;
@@ -182,9 +184,32 @@ public sealed class BuildTask : FrostingTask<BuildContext>
     {
         context.Information("Building solution...");
         context.DotNetBuild(context.DbUpProjectPath);
-        context.DotNetBuild(context.ApiProjectPath);
+        var buildSettings = new DotNetBuildSettings
+        {
+            MSBuildSettings = new DotNetMSBuildSettings().WithProperty("RunApiClientGen", "true"),
+        };
+        context.DotNetBuild(context.ApiProjectPath, buildSettings);
         context.DotNetBuild(context.BackendE2ETestsProjectPath);
         context.DotNetBuild(context.BuildersProjectPath);
+    }
+}
+
+[TaskName("RunClientGen")]
+[IsDependentOn(typeof(CleanTask))]
+public sealed class RunClientGen : FrostingTask<BuildContext>
+{
+    public override void Run(BuildContext context)
+    {
+        context.Information("Running API client generation for frontend...");
+
+        var buildSettings = new DotNetBuildSettings
+        {
+            MSBuildSettings = new DotNetMSBuildSettings().WithProperty("RunApiClientGen", "true"),
+        };
+
+        context.DotNetBuild(context.ApiProjectPath, buildSettings);
+
+        context.Information("API client generation completed successfully.");
     }
 }
 
