@@ -25,13 +25,15 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         var request = new ProcessPostcode.Request(postcode);
 
         // Act
-        await App.Client.POSTAsync<
+        var (response, result) = await App.Client.POSTAsync<
             ProcessPostcode.Endpoint,
             ProcessPostcode.Request,
             ProcessPostcode.Response
         >(request);
 
         // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
         Db.ChangeTracker.Clear();
         var dbRecord = await Db
             .Postcodes.Include(p => p.LSOADeprivation)
@@ -41,8 +43,8 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
                 TestContext.Current.CancellationToken
             );
 
-        Assert.NotNull(dbRecord);
-        Assert.Equal(lsoaCode, dbRecord.LSOACode);
+        dbRecord.ShouldNotBeNull();
+        dbRecord.LSOACode.ShouldBe(lsoaCode);
     }
 
     [Fact]
@@ -56,14 +58,13 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         var request = new ProcessPostcode.Request(postcode);
 
         // Act
-        var (response, _) = await App.Client.POSTAsync<
+        var response = await App.Client.POSTAsync<
             ProcessPostcode.Endpoint,
-            ProcessPostcode.Request,
-            ProcessPostcode.Response
+            ProcessPostcode.Request
         >(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
         Db.ChangeTracker.Clear();
         var dbRecord = await Db.Postcodes.FirstOrDefaultAsync(
@@ -71,7 +72,7 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
             TestContext.Current.CancellationToken
         );
 
-        Assert.Null(dbRecord);
+        dbRecord.ShouldBeNull();
     }
 
     [Fact]
@@ -84,6 +85,7 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         var existingPostcode = new PostcodeBuilder { PostcodeKey = postcode }
             .WithLSOADeprivationData(existingLsoa)
             .Build();
+        SetupEPCLookupSuccess(postcode);
 
         Db.Postcodes.Add(existingPostcode);
         await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -91,13 +93,15 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         var request = new ProcessPostcode.Request(postcode);
 
         // Act
-        await App.Client.POSTAsync<
+        var (response, _) = await App.Client.POSTAsync<
             ProcessPostcode.Endpoint,
             ProcessPostcode.Request,
             ProcessPostcode.Response
         >(request);
 
         // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
         await App
             .MockPostcodeLookupService.DidNotReceive()
             .GetLSOAAsync(Arg.Any<string>(), Arg.Any<CancellationToken>());
@@ -111,9 +115,9 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
                 TestContext.Current.CancellationToken
             );
 
-        Assert.NotNull(dbRecord);
-        Assert.Equal(existingLsoa, dbRecord.LSOACode);
-        Assert.NotNull(dbRecord.LSOADeprivation);
+        dbRecord.ShouldNotBeNull();
+        dbRecord.LSOACode.ShouldBe(existingLsoa);
+        dbRecord.LSOADeprivation.ShouldNotBeNull();
     }
 
     [Fact]
@@ -133,17 +137,20 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         await SetupLSOALookupSuccess(postcode, newLsoa);
+        SetupEPCLookupSuccess(postcode);
 
         var request = new ProcessPostcode.Request(postcode);
 
         // Act
-        await App.Client.POSTAsync<
+        var (response, _) = await App.Client.POSTAsync<
             ProcessPostcode.Endpoint,
             ProcessPostcode.Request,
             ProcessPostcode.Response
         >(request);
 
         // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
         await App
             .MockPostcodeLookupService.Received(1)
             .GetLSOAAsync(postcode, Arg.Any<CancellationToken>());
@@ -157,9 +164,9 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
                 TestContext.Current.CancellationToken
             );
 
-        Assert.NotNull(dbRecord);
-        Assert.Equal(newLsoa, dbRecord.LSOACode);
-        Assert.NotNull(dbRecord.LSOADeprivation);
+        dbRecord.ShouldNotBeNull();
+        dbRecord.LSOACode.ShouldBe(newLsoa);
+        dbRecord.LSOADeprivation.ShouldNotBeNull();
     }
 
     [Fact]
@@ -183,9 +190,9 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         >(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.NotNull(result);
-        Assert.Equal(cleanPostcode, result.Postcode);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        result.ShouldNotBeNull();
+        result.Postcode.ShouldBe(cleanPostcode);
 
         await App
             .MockPostcodeLookupService.Received(1)
@@ -200,8 +207,8 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
                 TestContext.Current.CancellationToken
             );
 
-        Assert.NotNull(dbRecord);
-        Assert.Equal(cleanPostcode, dbRecord.PostcodeKey);
+        dbRecord.ShouldNotBeNull();
+        dbRecord.PostcodeKey.ShouldBe(cleanPostcode);
     }
 
     [Fact]
@@ -238,10 +245,10 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         >(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.NotNull(result);
-        Assert.Equal(postcode, result.Postcode);
-        Assert.Equal("Postcode processed successfully.", result.Message);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        result.ShouldNotBeNull();
+        result.Postcode.ShouldBe(postcode);
+        result.Message.ShouldBe("Postcode processed successfully.");
 
         await App
             .MockEPCApiService.Received(1)
@@ -255,12 +262,66 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
                 TestContext.Current.CancellationToken
             );
 
-        Assert.NotNull(dbRecord);
-        var assessment = Assert.Single(dbRecord.EPCAssessments);
-        Assert.Equal(expectedAddress, assessment.AddressLine);
-        Assert.Equal(expectedRating, assessment.EPCRating);
-        Assert.Equal(postcode, assessment.PostcodeKey);
-        Assert.Equal(expectedRegistrationDate.ToInstant(), assessment.RegistrationDate);
+        dbRecord.ShouldNotBeNull();
+        var assessment = dbRecord.EPCAssessments.ShouldHaveSingleItem();
+        assessment.AddressLine.ShouldBe(expectedAddress);
+        assessment.EPCRating.ShouldBe(expectedRating);
+        assessment.PostcodeKey.ShouldBe(postcode);
+        assessment.RegistrationDate.ShouldBe(expectedRegistrationDate.ToInstant());
+    }
+
+    [Fact]
+    public async Task ProcessPostcodeEPCCertificateLookup_InitialLookup_ReturnsMultipleCertificates_SavesAll()
+    {
+        // Arrange
+        const string postcode = "BS1 5ZZ";
+        const string lsoaCode = "E01014421";
+
+        await SetupLSOALookupSuccess(postcode, lsoaCode);
+
+        var cert1 = new EPCCertificateBuilder
+        {
+            AddressLine1 = "10 High Street",
+            Postcode = postcode,
+        }.Build();
+        var cert2 = new EPCCertificateBuilder
+        {
+            AddressLine1 = "12 High Street",
+            Postcode = postcode,
+        }.Build();
+        var cert3 = new EPCCertificateBuilder
+        {
+            AddressLine1 = "14 High Street",
+            Postcode = postcode,
+        }.Build();
+
+        SetupEPCLookupSuccess(postcode, new List<EPCCertificate> { cert1, cert2, cert3 });
+
+        var request = new ProcessPostcode.Request(postcode);
+
+        // Act
+        var (response, _) = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request,
+            ProcessPostcode.Response
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.Count.ShouldBe(3);
+        dbRecord.EPCAssessments.ShouldContain(a => a.AddressLine == "10 High Street");
+        dbRecord.EPCAssessments.ShouldContain(a => a.AddressLine == "12 High Street");
+        dbRecord.EPCAssessments.ShouldContain(a => a.AddressLine == "14 High Street");
     }
 
     [Fact]
@@ -276,19 +337,17 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         var request = new ProcessPostcode.Request(postcode);
 
         // Act
-        var (response, _) = await App.Client.POSTAsync<
+        var response = await App.Client.POSTAsync<
             ProcessPostcode.Endpoint,
-            ProcessPostcode.Request,
-            ProcessPostcode.Response
+            ProcessPostcode.Request
         >(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+        response.StatusCode.ShouldBe(HttpStatusCode.BadGateway);
         var content = await response.Content.ReadAsStringAsync(
             TestContext.Current.CancellationToken
         );
         content.ShouldContain("EPC Gateway Error");
-        Assert.Contains("EPC Gateway Error", content);
 
         Db.ChangeTracker.Clear();
         var dbRecord = await Db
@@ -298,9 +357,9 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
                 TestContext.Current.CancellationToken
             );
 
-        Assert.NotNull(dbRecord);
-        Assert.Equal(lsoaCode, dbRecord.LSOACode);
-        Assert.Empty(dbRecord.EPCAssessments);
+        dbRecord.ShouldNotBeNull();
+        dbRecord.LSOACode.ShouldBe(lsoaCode);
+        dbRecord.EPCAssessments.ShouldBeEmpty();
     }
 
     [Fact]
@@ -329,6 +388,68 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         var request = new ProcessPostcode.Request(postcode);
 
         // Act
+        var response = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        var content = await response.Content.ReadAsStringAsync(
+            TestContext.Current.CancellationToken
+        );
+        content.ShouldContain($"EPC Certificate search returned null for Postcode {postcode}.");
+    }
+
+    [Fact]
+    public async Task ProcessPostcodeEPCCertificateLookup_CertificatesEmpty_ClearsExistingCertificates()
+    {
+        // Arrange
+        const string postcode = "BS1 7HH";
+        const string lsoaCode = "E01014421";
+
+        var cert1 = new EPCAssessmentBuilder
+        {
+            PostcodeKey = postcode,
+            AddressLine = "10 High Street",
+            EPCRating = "C",
+        }.Build();
+
+        var cert2 = new EPCAssessmentBuilder
+        {
+            PostcodeKey = postcode,
+            AddressLine = "12 High Street",
+            EPCRating = "D",
+        }.Build();
+
+        var existingPostcode = new PostcodeBuilder { PostcodeKey = postcode, LSOACode = lsoaCode }
+            .WithLSOADeprivationData(lsoaCode)
+            .Build();
+
+        existingPostcode.EPCAssessments.Add(cert1);
+        existingPostcode.EPCAssessments.Add(cert2);
+
+        Db.Postcodes.Add(existingPostcode);
+        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // EPC service returns success but with an empty list of certificates
+        var emptyResult = new EPCSearchResultBuilder
+        {
+            IsSuccess = true,
+            Certificates = new List<EPCCertificate>(),
+            ErrorMessage = null,
+            StatusCode = 200,
+        }.Build();
+
+        App.MockEPCApiService.SearchCertificatesByPostcodeAsync(
+                postcode,
+                Arg.Any<CancellationToken>()
+            )
+            .Returns(emptyResult);
+
+        var request = new ProcessPostcode.Request(postcode, RefreshEPCData: true);
+
+        // Act
         var (response, _) = await App.Client.POSTAsync<
             ProcessPostcode.Endpoint,
             ProcessPostcode.Request,
@@ -336,11 +457,18 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         >(request);
 
         // Assert
-        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        var content = await response.Content.ReadAsStringAsync(
-            TestContext.Current.CancellationToken
-        );
-        content.ShouldContain($"EPC Certificate search returned null for Postcode {postcode}.");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.ShouldBeEmpty();
     }
 
     [Fact]
@@ -398,7 +526,6 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         assessment.AddressLine.ShouldBe("Old Address");
         assessment.EPCRating.ShouldBe("C");
 
-        // Compare DateTime equivalents with a small tolerance (or compare truncated to milliseconds)
         assessment
             .UpdatedAt.ToDateTimeUtc()
             .ShouldBe(expectedUpdatedAt.ToDateTimeUtc(), TimeSpan.FromMilliseconds(10));
@@ -471,6 +598,96 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         assessment.AddressLine.ShouldBe("Old Address");
         assessment.RegistrationDate.ShouldBe(newRegistrationDate.ToInstant());
         assessment.RegistrationDate.ShouldNotBe(oldRegistrationDate.ToInstant());
+    }
+
+    [Fact]
+    public async Task ProcessPostcode_RefreshEPCDataTrue_CorrectlyAddsUpdatesAndRemovesEPCAssessments()
+    {
+        // Arrange
+        const string postcode = "BS2 1AA";
+        const string lsoaCode = "E01014421";
+
+        // This one should be deleted during sync because its address isn't returned by the API
+        var certToDelete = new EPCAssessmentBuilder
+        {
+            PostcodeKey = postcode,
+            AddressLine = "10 High Street",
+            EPCRating = "C",
+        }.Build();
+
+        // This one should be updated with new data based on matching address
+        var certToKeepAndEdit = new EPCAssessmentBuilder
+        {
+            PostcodeKey = postcode,
+            AddressLine = "12 High Street",
+            EPCRating = "D",
+        }.Build();
+
+        var existingPostcode = new PostcodeBuilder { PostcodeKey = postcode, LSOACode = lsoaCode }
+            .WithLSOADeprivationData(lsoaCode)
+            .Build();
+
+        existingPostcode.EPCAssessments.Add(certToDelete);
+        existingPostcode.EPCAssessments.Add(certToKeepAndEdit);
+
+        Db.Postcodes.Add(existingPostcode);
+        await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        // Mock API returns updated "12 High Street" and brand new "14 High Street"
+        var updatedCert2 = new EPCCertificateBuilder
+        {
+            AddressLine1 = "12 High Street",
+            Postcode = postcode,
+            CurrentEnergyEfficiencyBand = "A", // Rating updated from D to A
+        }.Build();
+
+        var newCert3 = new EPCCertificateBuilder
+        {
+            AddressLine1 = "14 High Street",
+            Postcode = postcode,
+            CurrentEnergyEfficiencyBand = "B",
+        }.Build();
+
+        SetupEPCLookupSuccess(postcode, new List<EPCCertificate> { updatedCert2, newCert3 });
+
+        var request = new ProcessPostcode.Request(postcode, RefreshEPCData: true);
+
+        // Act
+        var response = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.Count.ShouldBe(2);
+
+        // Assert "10 High Street" was removed
+        dbRecord.EPCAssessments.ShouldNotContain(a => a.AddressLine == "10 High Street");
+
+        // Assert "12 High Street" was updated
+        var assessment2 = dbRecord.EPCAssessments.SingleOrDefault(a =>
+            a.AddressLine == "12 High Street"
+        );
+        assessment2.ShouldNotBeNull();
+        assessment2.EPCRating.ShouldBe("A");
+
+        // Assert "14 High Street" was added
+        var assessment3 = dbRecord.EPCAssessments.SingleOrDefault(a =>
+            a.AddressLine == "14 High Street"
+        );
+        assessment3.ShouldNotBeNull();
+        assessment3.EPCRating.ShouldBe("B");
     }
 
     [Fact]
