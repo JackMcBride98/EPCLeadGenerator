@@ -5,17 +5,17 @@
     "version": "v1.0.0"
   },
   "paths": {
-    "/api/postcodes/lookup": {
+    "/api/postcodes/process": {
       "post": {
         "tags": [
           "Postcodes"
         ],
-        "operationId": "GetPostcodeDeprivation",
+        "operationId": "ProcessPostcode",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GetPostcodeDeprivation_Request"
+                "$ref": "#/components/schemas/ProcessPostcode_Request"
               }
             }
           },
@@ -27,7 +27,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetPostcodeDeprivation_Response"
+                  "$ref": "#/components/schemas/ProcessPostcode_Response"
                 }
               }
             }
@@ -68,195 +68,6 @@
   },
   "components": {
     "schemas": {
-      "EPCCertificate": {
-        "required": [
-          "certificateNumber",
-          "addressLine1",
-          "addressLine2",
-          "addressLine3",
-          "addressLine4",
-          "postcode",
-          "postTown",
-          "council",
-          "constituency",
-          "currentEnergyEfficiencyBand",
-          "registrationDate",
-          "uprn",
-          "schemaType"
-        ],
-        "type": "object",
-        "properties": {
-          "certificateNumber": {
-            "type": "string"
-          },
-          "addressLine1": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "addressLine2": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "addressLine3": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "addressLine4": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "postcode": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "postTown": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "council": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "constituency": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "currentEnergyEfficiencyBand": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "registrationDate": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "uprn": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int64"
-          },
-          "schemaType": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        }
-      },
-      "GetPostcodeDeprivation_PostcodeDeprivationResponse": {
-        "required": [
-          "postcode",
-          "markAsDone",
-          "lsoaCode",
-          "lsoaName",
-          "multipleDeprivationPercentage",
-          "multipleDeprivationDecile"
-        ],
-        "type": "object",
-        "properties": {
-          "postcode": {
-            "type": "string"
-          },
-          "markAsDone": {
-            "type": "boolean"
-          },
-          "lsoaCode": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "lsoaName": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "multipleDeprivationPercentage": {
-            "type": [
-              "null",
-              "number"
-            ],
-            "format": "double"
-          },
-          "multipleDeprivationDecile": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "format": "int32"
-          }
-        }
-      },
-      "GetPostcodeDeprivation_Request": {
-        "required": [
-          "postcode"
-        ],
-        "type": "object",
-        "properties": {
-          "postcode": {
-            "type": "string"
-          }
-        }
-      },
-      "GetPostcodeDeprivation_Response": {
-        "required": [
-          "data",
-          "epcData"
-        ],
-        "type": "object",
-        "properties": {
-          "data": {
-            "type": [
-              "null",
-              "object"
-            ],
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/GetPostcodeDeprivation_PostcodeDeprivationResponse"
-              }
-            ]
-          },
-          "epcData": {
-            "type": [
-              "null",
-              "array"
-            ],
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ListOfEPCCertificate"
-              }
-            ]
-          }
-        }
-      },
-      "ListOfEPCCertificate": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/EPCCertificate"
-        }
-      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -329,6 +140,36 @@
           }
         },
         "description": "RFC9457 compatible problem details/ error response class. this can be used by configuring startup like so:\n```app.UseFastEndpoints(c =&gt; c.Errors.UseProblemDetails())```"
+      },
+      "ProcessPostcode_Request": {
+        "required": [
+          "postcode"
+        ],
+        "type": "object",
+        "properties": {
+          "postcode": {
+            "type": "string"
+          },
+          "refreshEPCData": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "ProcessPostcode_Response": {
+        "required": [
+          "postcode",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "postcode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
       }
     },
     "securitySchemes": {
