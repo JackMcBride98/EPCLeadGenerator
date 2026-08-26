@@ -1,11 +1,11 @@
 ---
-name: jack-template-test
+name: epc-lead-generator-test
 services:
   db:
     image: postgres
-    container_name: jack-template-test-db
+    container_name: epc-lead-generator-test-db
     restart: always
     environment:
       POSTGRES_PASSWORD: mysecretpassword
     volumes: [./init.sql:/docker-entrypoint-initdb.d/init.sql]
-    ports: [5434:5432]
+    ports: [5435:5432]

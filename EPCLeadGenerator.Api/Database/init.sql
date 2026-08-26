@@ -1,1 +1,1 @@
-CREATE DATABASE "JackTemplateDatabase";
+CREATE DATABASE "EPCLeadGenerator";

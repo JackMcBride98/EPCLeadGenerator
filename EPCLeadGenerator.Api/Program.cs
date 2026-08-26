@@ -1,10 +1,10 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using EPCLeadGenerator.Api.Configuration;
+using EPCLeadGenerator.Api.Database;
+using EPCLeadGenerator.Api.Jobs;
+using EPCLeadGenerator.Api.Services;
 using FastEndpoints.OpenApi;
-using JackTemplate.Api.Configuration;
-using JackTemplate.Api.Database;
-using JackTemplate.Api.Jobs;
-using JackTemplate.Api.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using TickerQ.DependencyInjection;

@@ -1,6 +1,6 @@
-﻿using JackTemplate.Api.Database;
+﻿using EPCLeadGenerator.Api.Database;
 
-namespace JackTemplate.Api.Services;
+namespace EPCLeadGenerator.Api.Services;
 
 public interface IExampleService
 {

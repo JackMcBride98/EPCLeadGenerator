@@ -7,7 +7,11 @@ import type {
   TDataShape,
 } from "./client";
 import { client } from "./client.gen";
-import type { GetUserData, GetUserErrors, GetUserResponses } from "./types.gen";
+import type {
+  GetPostcodeDeprivationData,
+  GetPostcodeDeprivationErrors,
+  GetPostcodeDeprivationResponses,
+} from "./types.gen";
 
 export type Options<
   TData extends TDataShape = TDataShape,
@@ -27,11 +31,22 @@ export type Options<
   meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
-export const getUser = <ThrowOnError extends boolean = false>(
-  options?: Options<GetUserData, ThrowOnError>,
-): RequestResult<GetUserResponses, GetUserErrors, ThrowOnError> =>
-  (options?.client ?? client).get<
-    GetUserResponses,
-    GetUserErrors,
+export const getPostcodeDeprivation = <ThrowOnError extends boolean = false>(
+  options: Options<GetPostcodeDeprivationData, ThrowOnError>,
+): RequestResult<
+  GetPostcodeDeprivationResponses,
+  GetPostcodeDeprivationErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    GetPostcodeDeprivationResponses,
+    GetPostcodeDeprivationErrors,
     ThrowOnError
-  >({ url: "/api/profile", ...options });
+  >({
+    url: "/api/postcodes/lookup",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });

@@ -5,19 +5,29 @@
     "version": "v1.0.0"
   },
   "paths": {
-    "/api/profile": {
-      "get": {
+    "/api/postcodes/lookup": {
+      "post": {
         "tags": [
-          "Profile"
+          "Postcodes"
         ],
-        "operationId": "GetUser",
+        "operationId": "GetPostcodeDeprivation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetPostcodeDeprivation_Request"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetUser_Response"
+                  "$ref": "#/components/schemas/GetPostcodeDeprivation_Response"
                 }
               }
             }
@@ -48,34 +58,78 @@
   },
   "components": {
     "schemas": {
-      "GetUser_Response": {
+      "GetPostcodeDeprivation_PostcodeDeprivationResponse": {
         "required": [
-          "user"
+          "postcode",
+          "markAsDone",
+          "lsoaCode",
+          "lsoaName",
+          "multipleDeprivationPercentage",
+          "multipleDeprivationDecile"
         ],
         "type": "object",
         "properties": {
-          "user": {
-            "$ref": "#/components/schemas/GetUser_UserResponse"
+          "postcode": {
+            "type": "string"
+          },
+          "markAsDone": {
+            "type": "boolean"
+          },
+          "lsoaCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lsoaName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "multipleDeprivationPercentage": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "multipleDeprivationDecile": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
-      "GetUser_UserResponse": {
+      "GetPostcodeDeprivation_Request": {
         "required": [
-          "userId",
-          "name",
-          "createdAt"
+          "postcode"
         ],
         "type": "object",
         "properties": {
-          "userId": {
+          "postcode": {
             "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
+          }
+        }
+      },
+      "GetPostcodeDeprivation_Response": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GetPostcodeDeprivation_PostcodeDeprivationResponse"
+              }
+            ]
           }
         }
       },

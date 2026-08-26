@@ -1,8 +1,8 @@
-﻿using JackTemplate.Api.Services;
+﻿using EPCLeadGenerator.Api.Services;
 using TickerQ.Utilities.Base;
 using TickerQ.Utilities.Interfaces;
 
-namespace JackTemplate.Api.Jobs;
+namespace EPCLeadGenerator.Api.Jobs;
 
 public record ExampleJobPayload(string UserId);
 
