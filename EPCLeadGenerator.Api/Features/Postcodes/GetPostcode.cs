@@ -1,4 +1,5 @@
-﻿using EPCLeadGenerator.Api.Database;
+﻿using System.Net;
+using EPCLeadGenerator.Api.Database;
 using EPCLeadGenerator.Api.Services; // Namespace for your IPostcodeLookupService
 using Microsoft.EntityFrameworkCore;
 
@@ -29,19 +30,14 @@ public class GetPostcodeDeprivation
 
             Description(b =>
                 b.ProducesProblemFE<ProblemDetails>(404, "application/problem+json")
-                    .ProducesProblemFE<ProblemDetails>(422, "application/problem+json")
                     .ProducesProblemFE<ProblemDetails>(502, "application/problem+json")
-                    .ProducesProblemFE<ProblemDetails>(503, "application/problem+json")
             );
 
             Summary(s =>
             {
-                s.Summary = "Looks up postcode deprivation data";
-                s.Responses[200] = "Successfully retrieved postcode deprivation details.";
-                s.Responses[404] = "The provided postcode could not be found.";
-                s.Responses[422] = "The request payload failed validation.";
-                s.Responses[502] = "Bad gateway response from postcode service provider.";
-                s.Responses[503] = "Postcode lookup service is currently unavailable.";
+                s.Responses[200] = "The request was successful.";
+                s.Responses[404] = "The requested resource was not found.";
+                s.Responses[502] = "An upstream service gateway error occurred.";
             });
         }
 
@@ -68,7 +64,7 @@ public class GetPostcodeDeprivation
                 {
                     ThrowError(
                         lookup.ErrorMessage ?? "Failed to lookup postcode externally.",
-                        lookup.StatusCode
+                        lookup.StatusCode == 404 ? 404 : 502
                     );
                 }
 
