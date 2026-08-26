@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using EPCLeadGenerator.Api.Database;
-using EPCLeadGenerator.Api.Services; // Namespace for your IPostcodeLookupService
+using EPCLeadGenerator.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace EPCLeadGenerator.Api.Features.Postcodes;
@@ -18,10 +18,16 @@ public class GetPostcodeDeprivation
         int? MultipleDeprivationDecile
     );
 
-    public record Response(PostcodeDeprivationResponse? Data);
+    public record Response(
+        PostcodeDeprivationResponse? Data,
+        List<EPCCertificate>? EpcData // Updated to return the flattened list of certificates directly
+    );
 
-    public class Endpoint(DataContext dataContext, IPostcodeLookupService postcodeService)
-        : Endpoint<Request, Response>
+    public class Endpoint(
+        DataContext dataContext,
+        IPostcodeLookupService postcodeService,
+        IEPCApiService epcApiService
+    ) : Endpoint<Request, Response>
     {
         public override void Configure()
         {
@@ -79,6 +85,20 @@ public class GetPostcodeDeprivation
 
             await dataContext.SaveChangesAsync(ct);
 
+            // 🔍 Test calling the EPC API service using the provided postcode (auto-flattens all pages)
+            var epcResult = await epcApiService.SearchCertificatesByPostcodeAsync(
+                cleanPostcode,
+                ct
+            );
+
+            if (!epcResult.IsSuccess && epcResult.StatusCode != 404)
+            {
+                ThrowError(
+                    epcResult.ErrorMessage ?? "Failed to lookup EPC certificates externally.",
+                    epcResult.StatusCode
+                );
+            }
+
             var lsoa = postcodeRecord.LSOADeprivation;
 
             return new Response(
@@ -89,7 +109,8 @@ public class GetPostcodeDeprivation
                     LSOAName: lsoa?.LSOAName,
                     MultipleDeprivationPercentage: lsoa?.MultipleDeprivationPercentage,
                     MultipleDeprivationDecile: lsoa?.MultipleDeprivationDecile
-                )
+                ),
+                epcResult.Certificates
             );
         }
     }

@@ -16,6 +16,7 @@ public abstract class TestBase(App app) : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         App.MockPostcodeLookupService.ClearSubstitute();
+        App.MockEPCApiService.ClearSubstitute();
 
         await ResetDatabaseAsync();
 

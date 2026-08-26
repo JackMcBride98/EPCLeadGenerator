@@ -4,6 +4,22 @@ export type ClientOptions = {
   baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type EpcCertificate = {
+  certificateNumber: string;
+  addressLine1: null | string;
+  addressLine2: null | string;
+  addressLine3: null | string;
+  addressLine4: null | string;
+  postcode: null | string;
+  postTown: null | string;
+  council: null | string;
+  constituency: null | string;
+  currentEnergyEfficiencyBand: null | string;
+  registrationDate: null | string;
+  uprn: null | number;
+  schemaType: null | string;
+};
+
 export type GetPostcodeDeprivationPostcodeDeprivationResponse = {
   postcode: string;
   markAsDone: boolean;
@@ -19,7 +35,10 @@ export type GetPostcodeDeprivationRequest = {
 
 export type GetPostcodeDeprivationResponse = {
   data: GetPostcodeDeprivationPostcodeDeprivationResponse | null;
+  epcData: ListOfEpcCertificate | null;
 };
+
+export type ListOfEpcCertificate = Array<EpcCertificate>;
 
 /**
  * RFC9457 compatible problem details/ error response class. this can be used by configuring startup like so:
