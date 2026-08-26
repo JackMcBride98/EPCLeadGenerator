@@ -61,7 +61,7 @@ if (!isDocumentGeneration)
     optionsBuilder.ValidateOnStart();
 }
 
-builder.Services.AddScoped<IExampleService, ExampleService>();
+builder.Services.AddHttpClient<IPostcodeLookupService, PostcodeLookupService>();
 builder.Services.AddTickerQ();
 builder.Services.MapTicker<ExampleJob, ExampleJobPayload>();
 
@@ -103,9 +103,13 @@ app.UseFastEndpoints(c =>
         x.TitleTransformer = pd =>
             pd.Status switch
             {
-                400 => "Validation Error",
+                400 => "Bad Request",
                 404 => "Not Found",
-                _ => "One or more errors occurred!",
+                422 => "Unprocessable Entity",
+                500 => "Internal Server Error",
+                502 => "Bad Gateway",
+                503 => "Service Unavailable",
+                _ => "An unexpected error occurred!",
             };
     });
 });

@@ -10,6 +10,7 @@
         "tags": [
           "Postcodes"
         ],
+        "summary": "Looks up postcode deprivation data",
         "operationId": "GetPostcodeDeprivation",
         "requestBody": {
           "content": {
@@ -23,7 +24,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successfully retrieved postcode deprivation details.",
             "content": {
               "application/json": {
                 "schema": {
@@ -33,7 +34,17 @@
             }
           },
           "404": {
-            "description": "Not Found",
+            "description": "The provided postcode could not be found.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The request payload failed validation.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -44,6 +55,26 @@
           },
           "500": {
             "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Bad gateway response from postcode service provider.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Postcode lookup service is currently unavailable.",
             "content": {
               "application/problem+json": {
                 "schema": {

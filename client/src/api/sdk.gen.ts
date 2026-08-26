@@ -31,6 +31,9 @@ export type Options<
   meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
+/**
+ * Looks up postcode deprivation data
+ */
 export const getPostcodeDeprivation = <ThrowOnError extends boolean = false>(
   options: Options<GetPostcodeDeprivationData, ThrowOnError>,
 ): RequestResult<
