@@ -7,9 +7,6 @@ import type {
   GetPostcodeDeprivationResponse2,
 } from "../types.gen";
 
-/**
- * Looks up postcode deprivation data
- */
 export const getPostcodeDeprivationMutation = (
   options?: Partial<Options<GetPostcodeDeprivationData>>,
 ): UseMutationOptions<

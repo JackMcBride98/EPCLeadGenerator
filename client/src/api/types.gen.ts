@@ -64,25 +64,17 @@ export type GetPostcodeDeprivationData = {
 
 export type GetPostcodeDeprivationErrors = {
   /**
-   * The provided postcode could not be found.
+   * The requested resource was not found.
    */
   404: ProblemDetails;
-  /**
-   * The request payload failed validation.
-   */
-  422: ProblemDetails;
   /**
    * Server Error
    */
   500: ProblemDetails;
   /**
-   * Bad gateway response from postcode service provider.
+   * An upstream service gateway error occurred.
    */
   502: ProblemDetails;
-  /**
-   * Postcode lookup service is currently unavailable.
-   */
-  503: ProblemDetails;
 };
 
 export type GetPostcodeDeprivationError =
@@ -90,7 +82,7 @@ export type GetPostcodeDeprivationError =
 
 export type GetPostcodeDeprivationResponses = {
   /**
-   * Successfully retrieved postcode deprivation details.
+   * The request was successful.
    */
   200: GetPostcodeDeprivationResponse;
 };
