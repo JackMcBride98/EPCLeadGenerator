@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using EPCLeadGenerator.Api.Database;
 
-namespace Builders;
+namespace Builders.Postcodes;
 
 public class PostcodeBuilder : Builder<Postcode>
 {
@@ -15,6 +15,14 @@ public class PostcodeBuilder : Builder<Postcode>
     public PostcodeBuilder WithLSOADeprivationData(LSOADeprivationBuilder? lsoaBuilder = null)
     {
         var lsoa = (lsoaBuilder ?? new LSOADeprivationBuilder()).Build();
+        LSOADeprivation = lsoa;
+        LSOACode = lsoa.LSOACode;
+        return this;
+    }
+
+    public PostcodeBuilder WithLSOADeprivationData(string lsoaCode)
+    {
+        var lsoa = new LSOADeprivationBuilder { LSOACode = lsoaCode }.Build();
         LSOADeprivation = lsoa;
         LSOACode = lsoa.LSOACode;
         return this;

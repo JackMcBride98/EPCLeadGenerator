@@ -6,6 +6,8 @@ namespace EPCLeadGenerator.Api.Database;
 
 public class EPCAssessment
 {
+    public const int EPCAssessmentExpiryDayCount = 365 * 10; // 10 years
+
     [Key]
     public int EPCAssessmentId { get; set; }
 
@@ -19,9 +21,15 @@ public class EPCAssessment
     [MaxLength(2)]
     public string? EPCRating { get; set; }
 
-    public bool IsExpired { get; set; }
+    public Instant RegistrationDate { get; set; }
 
-    public Instant CreatedAt { get; set; }
+    public bool IsExpired =>
+        RegistrationDate
+        < SystemClock
+            .Instance.GetCurrentInstant()
+            .Minus(Duration.FromDays(EPCAssessmentExpiryDayCount));
+
+    public Instant UpdatedAt { get; set; }
 
     [ForeignKey(nameof(PostcodeKey))]
     public Postcode Postcode { get; set; } = null!;
