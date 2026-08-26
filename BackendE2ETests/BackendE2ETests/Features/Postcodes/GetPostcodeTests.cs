@@ -1,5 +1,8 @@
 ﻿using Builders;
+using Builders.EPCApi;
 using EPCLeadGenerator.Api.Features.Postcodes;
+using EPCLeadGenerator.Api.Services;
+using NSubstitute;
 
 namespace Tests.Features.Postcodes;
 
@@ -28,6 +31,22 @@ public class GetPostcodeDeprivationEndpointTests(App app) : TestBase(app)
 
         Db.Postcodes.Add(postcode);
         await Db.SaveChangesAsync(TestContext.Current.CancellationToken);
+
+        var epcCertificates = new List<EPCCertificate>
+        {
+            new EPCCertificateBuilder
+            {
+                CertificateNumber = "CERT-123",
+                AddressLine1 = "123 Fake St",
+                Postcode = "BS8 1QU",
+            }.Build(),
+        };
+
+        App.MockEPCApiService.SearchCertificatesByPostcodeAsync(
+                "BS8 1QU",
+                Arg.Any<CancellationToken>()
+            )
+            .Returns(new EPCSearchResult(true, epcCertificates, null));
 
         var request = new GetPostcodeDeprivation.Request("BS8 1QU");
 

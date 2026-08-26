@@ -3,6 +3,7 @@
 export { getPostcodeDeprivation, type Options } from "./sdk.gen";
 export type {
   ClientOptions,
+  EpcCertificate,
   GetPostcodeDeprivationData,
   GetPostcodeDeprivationError,
   GetPostcodeDeprivationErrors,
@@ -11,5 +12,6 @@ export type {
   GetPostcodeDeprivationResponse,
   GetPostcodeDeprivationResponse2,
   GetPostcodeDeprivationResponses,
+  ListOfEpcCertificate,
   ProblemDetails,
 } from "./types.gen";

@@ -68,6 +68,102 @@
   },
   "components": {
     "schemas": {
+      "EPCCertificate": {
+        "required": [
+          "certificateNumber",
+          "addressLine1",
+          "addressLine2",
+          "addressLine3",
+          "addressLine4",
+          "postcode",
+          "postTown",
+          "council",
+          "constituency",
+          "currentEnergyEfficiencyBand",
+          "registrationDate",
+          "uprn",
+          "schemaType"
+        ],
+        "type": "object",
+        "properties": {
+          "certificateNumber": {
+            "type": "string"
+          },
+          "addressLine1": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "addressLine2": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "addressLine3": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "addressLine4": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postcode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "postTown": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "council": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "constituency": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "currentEnergyEfficiencyBand": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "registrationDate": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "uprn": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "schemaType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "GetPostcodeDeprivation_PostcodeDeprivationResponse": {
         "required": [
           "postcode",
@@ -126,7 +222,8 @@
       },
       "GetPostcodeDeprivation_Response": {
         "required": [
-          "data"
+          "data",
+          "epcData"
         ],
         "type": "object",
         "properties": {
@@ -140,7 +237,24 @@
                 "$ref": "#/components/schemas/GetPostcodeDeprivation_PostcodeDeprivationResponse"
               }
             ]
+          },
+          "epcData": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ListOfEPCCertificate"
+              }
+            ]
           }
+        }
+      },
+      "ListOfEPCCertificate": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/EPCCertificate"
         }
       },
       "ProblemDetails": {

@@ -61,7 +61,9 @@ if (!isDocumentGeneration)
     optionsBuilder.ValidateOnStart();
 }
 
+builder.Services.AddHttpClient<IEPCApiService, EPCApiService>();
 builder.Services.AddHttpClient<IPostcodeLookupService, PostcodeLookupService>();
+
 builder.Services.AddTickerQ();
 builder.Services.MapTicker<ExampleJob, ExampleJobPayload>();
 

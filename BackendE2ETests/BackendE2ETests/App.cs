@@ -10,6 +10,8 @@ public class App : AppFixture<Program>
 {
     public IPostcodeLookupService MockPostcodeLookupService { get; private set; } =
         Substitute.For<IPostcodeLookupService>();
+    public IEPCApiService MockEPCApiService { get; private set; } =
+        Substitute.For<IEPCApiService>();
 
     public string DatabaseConnectionString =>
         Services.GetRequiredService<IConfiguration>().GetRequiredSection("Database")[
@@ -35,5 +37,8 @@ public class App : AppFixture<Program>
     {
         services.RemoveAll<IPostcodeLookupService>();
         services.AddSingleton(MockPostcodeLookupService);
+
+        services.RemoveAll<IEPCApiService>();
+        services.AddSingleton(MockEPCApiService);
     }
 }
