@@ -101,7 +101,10 @@ public class ProcessPostcode
 
                 if (epcResult.Certificates == null)
                 {
-                    ThrowError($"No EPC certificates found for postcode {cleanPostcode}.", 404);
+                    ThrowError(
+                        $"EPC Certificate search returned null for Postcode {cleanPostcode}.",
+                        404
+                    );
                 }
 
                 var newAssessments = epcResult

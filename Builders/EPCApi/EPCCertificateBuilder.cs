@@ -13,6 +13,8 @@ public class EPCCertificateBuilder : Builder<EPCCertificate>
     public string? Postcode { get; set; } = Faker.Address.ZipCode();
     public string? CurrentEnergyEfficiencyBand { get; set; } =
         Faker.PickRandom("A", "B", "C", "D", "E", "F", "G");
+    public DateTime RegistrationDate { get; set; } =
+        Faker.Date.Recent(30).AddYears(Faker.Random.Int(-15, -5));
 
     public override EPCCertificate Build() =>
         new(
@@ -26,7 +28,7 @@ public class EPCCertificateBuilder : Builder<EPCCertificate>
             Council: null,
             Constituency: null,
             CurrentEnergyEfficiencyBand: CurrentEnergyEfficiencyBand,
-            RegistrationDate: Faker.Date.Recent(30).ToString("yyyy-MM-dd"),
+            RegistrationDate: RegistrationDate.ToString("yyyy-MM-dd"),
             Uprn: Faker.Random.Long(100000000, 999999999),
             SchemaType: "RdSAP"
         );
