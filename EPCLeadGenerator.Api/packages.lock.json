@@ -25,6 +25,16 @@
           "Microsoft.AspNetCore.OpenApi": "10.0.9"
         }
       },
+      "LinqKit.Microsoft.EntityFrameworkCore": {
+        "type": "Direct",
+        "requested": "[10.0.11, )",
+        "resolved": "10.0.11",
+        "contentHash": "NQS+uQ7mmUAMU04CP/WRQVcWIGt/WAv6qBHSZJiqDPsTm1XesCEDfSB90Q/2o7UdA3z2dozjxaUALWbVyQcSUA==",
+        "dependencies": {
+          "LinqKit.Core": "1.2.11",
+          "Microsoft.EntityFrameworkCore": "10.0.0"
+        }
+      },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
         "requested": "[10.0.11, )",
@@ -128,6 +138,11 @@
         "type": "Transitive",
         "resolved": "12.1.1",
         "contentHash": "EPpkIe1yh1a0OXyC100oOA8WMbZvqUu5plwhvYcb7oSELfyUZzfxV48BLhvs3kKo4NwG7MGLNgy1RJiYtT8Dpw=="
+      },
+      "LinqKit.Core": {
+        "type": "Transitive",
+        "resolved": "1.2.11",
+        "contentHash": "jQXu7G9Ik6BDcS5506RV1CI184pG5eHwvqzrB5zEivciW7KiZ9iHM8ZTyu5o/TGt55woagJGUVsJYw4aBjRfEQ=="
       },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",

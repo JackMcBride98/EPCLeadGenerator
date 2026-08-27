@@ -1,5 +1,5 @@
 ﻿### Test Postcode Deprivation Lookup
-POST http://localhost:5030/api/postcodes/lookup
+POST http://localhost:5030/api/postcodes/process
 Content-Type: application/json
 
 {

@@ -20,6 +20,7 @@ CREATE TABLE "Postcodes" (
     "Postcode" VARCHAR(10) PRIMARY KEY,
     "LSOACode" VARCHAR(20) NULL,
     "MarkAsDone" BOOLEAN NOT NULL DEFAULT FALSE,
+    "EPCsLastUpdatedAt" TIMESTAMPTZ NULL,
     CONSTRAINT "FkPostcodeLSOA" FOREIGN KEY ("LSOACode")
        REFERENCES "LSOADeprivation"("LSOACode")
 );
@@ -28,14 +29,21 @@ CREATE INDEX "IdxPostcodesLSOACode" ON "Postcodes"("LSOACode");
 
 
 CREATE TABLE "EPCAssessments" (
-    "EPCAssessmentId" SERIAL PRIMARY KEY,
+    "EPCAssessmentId" BIGSERIAL PRIMARY KEY,
+    "UniquePropertyReferenceNumber" BIGINT NOT NULL,
+    "CertificateNumber" VARCHAR(24) NOT NULL,
     "Postcode" VARCHAR(10) NOT NULL,
     "AddressLine" VARCHAR(1000) NOT NULL,
     "EPCRating" VARCHAR(2) CHECK ("EPCRating" IN ('A', 'B', 'C', 'D', 'E', 'F', 'G')),
+    "IsLatest" BOOLEAN NOT NULL DEFAULT FALSE,
     "RegistrationDate" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "UpdatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "FkEPCPostcode" FOREIGN KEY ("Postcode")
-        REFERENCES "Postcodes"("Postcode")
+      REFERENCES "Postcodes"("Postcode")
 );
 
-CREATE INDEX "IdxEPCPostcode" ON "EPCAssessments"("Postcode");
+CREATE UNIQUE INDEX "UqEPCCertificateNumber" ON "EPCAssessments"("CertificateNumber");
+
+CREATE INDEX "IdxEPCUPRN" ON "EPCAssessments"("UniquePropertyReferenceNumber");
+
+CREATE INDEX "IdxEPCPostcodeIsLatest" ON "EPCAssessments"("Postcode", "IsLatest");

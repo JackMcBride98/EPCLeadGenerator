@@ -268,6 +268,8 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         assessment.EPCRating.ShouldBe(expectedRating);
         assessment.PostcodeKey.ShouldBe(postcode);
         assessment.RegistrationDate.ShouldBe(expectedRegistrationDate.ToInstant());
+
+        dbRecord.EPCsLastUpdatedAt.ShouldNotBeNull();
     }
 
     [Fact]
@@ -753,6 +755,293 @@ public class ProcessPostcodeTests(App app) : TestBase(app)
         assessment
             .UpdatedAt.ToDateTimeUtc()
             .ShouldBe(expectedUpdatedAt.ToDateTimeUtc(), TimeSpan.FromMilliseconds(10));
+    }
+
+    [Fact]
+    public async Task ProcessPostcode_CertificatesWithoutUPRN_FiltersOutAndLogsWarning()
+    {
+        // Arrange
+        const string postcode = "BS1 8UP";
+        const string lsoaCode = "E01014421";
+
+        await SetupLSOALookupSuccess(postcode, lsoaCode);
+
+        var validCert = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = 100012345678,
+            CertificateNumber = "CERT-VALID-001",
+        }.Build();
+
+        var invalidCert = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = null,
+            CertificateNumber = "CERT-NO-UPRN-002",
+        }.Build();
+
+        SetupEPCLookupSuccess(postcode, new List<EPCCertificate> { validCert, invalidCert });
+
+        var request = new ProcessPostcode.Request(postcode);
+
+        // Act
+        var (response, _) = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request,
+            ProcessPostcode.Response
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        var assessment = dbRecord.EPCAssessments.ShouldHaveSingleItem();
+        assessment.CertificateNumber.ShouldBe("CERT-VALID-001");
+        assessment.UniquePropertyReferenceNumber.ShouldBe(100012345678);
+    }
+
+    [Fact]
+    public async Task ProcessPostcode_AllCertificatesMissingUPRN_SavesNoEPCAssessments()
+    {
+        // Arrange
+        const string postcode = "BS1 8NO";
+        const string lsoaCode = "E01014421";
+
+        await SetupLSOALookupSuccess(postcode, lsoaCode);
+
+        var cert1 = new EPCCertificateBuilder { Postcode = postcode, Uprn = null }.Build();
+        var cert2 = new EPCCertificateBuilder { Postcode = postcode, Uprn = null }.Build();
+
+        SetupEPCLookupSuccess(postcode, new List<EPCCertificate> { cert1, cert2 });
+
+        var request = new ProcessPostcode.Request(postcode);
+
+        // Act
+        var (response, _) = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request,
+            ProcessPostcode.Response
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public async Task ProcessPostcode_MultipleCertificatesSameUPRN_SetsIsLatestTrueOnlyForMostRecentRegistrationDate()
+    {
+        // Arrange
+        const string postcode = "BS1 9LAT";
+        const string lsoaCode = "E01014421";
+        const long uprn = 100099998888;
+
+        await SetupLSOALookupSuccess(postcode, lsoaCode);
+
+        var olderCert = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = uprn,
+            CertificateNumber = "CERT-OLD-111",
+            RegistrationDate = DateTime.UtcNow.AddYears(-3).Date,
+        }.Build();
+
+        var newerCert = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = uprn,
+            CertificateNumber = "CERT-NEW-222",
+            RegistrationDate = DateTime.UtcNow.AddMonths(-2).Date,
+        }.Build();
+
+        SetupEPCLookupSuccess(postcode, new List<EPCCertificate> { olderCert, newerCert });
+
+        var request = new ProcessPostcode.Request(postcode);
+
+        // Act
+        var (response, _) = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request,
+            ProcessPostcode.Response
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.Count.ShouldBe(2);
+
+        var savedOlder = dbRecord.EPCAssessments.Single(a => a.CertificateNumber == "CERT-OLD-111");
+        var savedNewer = dbRecord.EPCAssessments.Single(a => a.CertificateNumber == "CERT-NEW-222");
+
+        savedOlder.IsLatest.ShouldBeFalse();
+        savedNewer.IsLatest.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task ProcessPostcode_MultiplePropertiesWithMultipleCertificates_SetsIsLatestCorrectlyPerUPRNGroup()
+    {
+        // Arrange
+        const string postcode = "BS1 9GRP";
+        const string lsoaCode = "E01014421";
+        const long uprnProp1 = 100011112222;
+        const long uprnProp2 = 100033334444;
+
+        await SetupLSOALookupSuccess(postcode, lsoaCode);
+
+        // Property 1 (2 Certificates)
+        var prop1Old = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = uprnProp1,
+            CertificateNumber = "P1-OLD",
+            RegistrationDate = DateTime.UtcNow.AddYears(-5).Date,
+        }.Build();
+
+        var prop1New = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = uprnProp1,
+            CertificateNumber = "P1-NEW",
+            RegistrationDate = DateTime.UtcNow.AddMonths(-1).Date,
+        }.Build();
+
+        // Property 2 (2 Certificates)
+        var prop2Old = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = uprnProp2,
+            CertificateNumber = "P2-OLD",
+            RegistrationDate = DateTime.UtcNow.AddYears(-2).Date,
+        }.Build();
+
+        var prop2New = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = uprnProp2,
+            CertificateNumber = "P2-NEW",
+            RegistrationDate = DateTime.UtcNow.AddDays(-10).Date,
+        }.Build();
+
+        SetupEPCLookupSuccess(
+            postcode,
+            new List<EPCCertificate> { prop1Old, prop1New, prop2Old, prop2New }
+        );
+
+        var request = new ProcessPostcode.Request(postcode);
+
+        // Act
+        var (response, _) = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request,
+            ProcessPostcode.Response
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.Count.ShouldBe(4);
+
+        // Property 1 Assertions
+        dbRecord
+            .EPCAssessments.Single(a => a.CertificateNumber == "P1-OLD")
+            .IsLatest.ShouldBeFalse();
+        dbRecord
+            .EPCAssessments.Single(a => a.CertificateNumber == "P1-NEW")
+            .IsLatest.ShouldBeTrue();
+
+        // Property 2 Assertions
+        dbRecord
+            .EPCAssessments.Single(a => a.CertificateNumber == "P2-OLD")
+            .IsLatest.ShouldBeFalse();
+        dbRecord
+            .EPCAssessments.Single(a => a.CertificateNumber == "P2-NEW")
+            .IsLatest.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task ProcessPostcode_SingleCertificatePerUPRN_SetsIsLatestTrueForAll()
+    {
+        // Arrange
+        const string postcode = "BS1 9SGL";
+        const string lsoaCode = "E01014421";
+
+        await SetupLSOALookupSuccess(postcode, lsoaCode);
+
+        var certProp1 = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = 100010001000,
+            CertificateNumber = "CERT-P1",
+        }.Build();
+
+        var certProp2 = new EPCCertificateBuilder
+        {
+            Postcode = postcode,
+            Uprn = 200020002000,
+            CertificateNumber = "CERT-P2",
+        }.Build();
+
+        SetupEPCLookupSuccess(postcode, new List<EPCCertificate> { certProp1, certProp2 });
+
+        var request = new ProcessPostcode.Request(postcode);
+
+        // Act
+        var (response, _) = await App.Client.POSTAsync<
+            ProcessPostcode.Endpoint,
+            ProcessPostcode.Request,
+            ProcessPostcode.Response
+        >(request);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        Db.ChangeTracker.Clear();
+        var dbRecord = await Db
+            .Postcodes.Include(p => p.EPCAssessments)
+            .FirstOrDefaultAsync(
+                p => p.PostcodeKey == postcode,
+                TestContext.Current.CancellationToken
+            );
+
+        dbRecord.ShouldNotBeNull();
+        dbRecord.EPCAssessments.Count.ShouldBe(2);
+        dbRecord.EPCAssessments.All(a => a.IsLatest).ShouldBeTrue();
     }
 
     private async Task SetupLSOALookupSuccess(string postcode, string lsoaCode)

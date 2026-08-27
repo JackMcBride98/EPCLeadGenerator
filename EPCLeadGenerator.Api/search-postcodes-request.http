@@ -1,0 +1,7 @@
+﻿### Test Postcode Deprivation Lookup
+POST http://localhost:5030/api/postcodes/processed
+Content-Type: application/json
+
+{
+  "postcodeSearchTerm": "BS7"
+}

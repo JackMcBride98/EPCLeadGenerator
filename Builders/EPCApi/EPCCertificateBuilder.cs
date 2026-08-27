@@ -15,6 +15,7 @@ public class EPCCertificateBuilder : Builder<EPCCertificate>
         Faker.PickRandom("A", "B", "C", "D", "E", "F", "G");
     public DateTime RegistrationDate { get; set; } =
         Faker.Date.Recent(30).AddYears(Faker.Random.Int(-15, -5));
+    public long? Uprn { get; set; } = Faker.Random.Long(100000000, 999999999);
 
     public override EPCCertificate Build() =>
         new(
@@ -29,7 +30,7 @@ public class EPCCertificateBuilder : Builder<EPCCertificate>
             Constituency: null,
             CurrentEnergyEfficiencyBand: CurrentEnergyEfficiencyBand,
             RegistrationDate: RegistrationDate.ToString("yyyy-MM-dd"),
-            Uprn: Faker.Random.Long(100000000, 999999999),
+            Uprn: Uprn,
             SchemaType: "RdSAP"
         );
 }

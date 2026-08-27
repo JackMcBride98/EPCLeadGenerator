@@ -81,6 +81,6 @@ https://687979656894.signin.aws.amazon.com/console - console sign in link for pl
 who you want to be signed in with when using tofu locally.
 
 # TODO
-- Create endpoint which returns the Deprivation and EPC data for a given postcode
+- Create endpoint to mark Postcodes as Done?
 - Create frontend page to display the data for a given postcode
 - Host on coolify

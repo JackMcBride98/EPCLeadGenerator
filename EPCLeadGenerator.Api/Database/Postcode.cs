@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NodaTime;
 
 namespace EPCLeadGenerator.Api.Database;
 
@@ -14,6 +15,8 @@ public class Postcode
     public string? LSOACode { get; set; }
 
     public bool MarkAsDone { get; set; }
+
+    public Instant? EPCsLastUpdatedAt { get; set; }
 
     [ForeignKey(nameof(LSOACode))]
     public LSOADeprivation? LSOADeprivation { get; set; }

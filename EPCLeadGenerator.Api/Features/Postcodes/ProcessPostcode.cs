@@ -1,6 +1,7 @@
 ﻿using EPCLeadGenerator.Api.Database;
 using EPCLeadGenerator.Api.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NodaTime;
 using NodaTime.Extensions;
 using NodaTime.Text;
@@ -16,7 +17,8 @@ public class ProcessPostcode
     public class Endpoint(
         DataContext dataContext,
         IPostcodeLookupService postcodeService,
-        IEPCApiService epcApiService
+        IEPCApiService epcApiService,
+        ILogger<Endpoint> logger
     ) : Endpoint<Request, Response>
     {
         public override void Configure()
@@ -92,13 +94,6 @@ public class ProcessPostcode
                     );
                 }
 
-                if (postcodeHasExistingEPCData)
-                {
-                    dataContext.EPCAssessments.RemoveRange(postcodeRecord.EPCAssessments);
-                }
-
-                var now = DateTime.UtcNow.ToInstant();
-
                 if (epcResult.Certificates == null)
                 {
                     ThrowError(
@@ -107,24 +102,86 @@ public class ProcessPostcode
                     );
                 }
 
-                var newAssessments = epcResult
-                    .Certificates!.Select(c => new EPCAssessment
-                    {
-                        PostcodeKey = cleanPostcode,
-                        AddressLine = c.AddressLine1 ?? "No Address Line 1 Found",
-                        EPCRating = c.CurrentEnergyEfficiencyBand,
-                        RegistrationDate =
-                            ParseRegistrationDateToInstant(c.RegistrationDate) ?? now,
-                        UpdatedAt = now,
-                    })
-                    .ToList();
+                var validCertificates = FilterValidCertificates(
+                    epcResult.Certificates,
+                    cleanPostcode,
+                    logger
+                );
+
+                if (postcodeHasExistingEPCData)
+                {
+                    dataContext.EPCAssessments.RemoveRange(postcodeRecord.EPCAssessments);
+                }
+
+                var newAssessments = MapAndFlagLatestAssessments(validCertificates, cleanPostcode);
 
                 dataContext.EPCAssessments.AddRange(newAssessments);
+
+                postcodeRecord.EPCsLastUpdatedAt = SystemClock.Instance.GetCurrentInstant();
+
                 await dataContext.SaveChangesAsync(ct);
             }
 
             return new Response(cleanPostcode, "Postcode processed successfully.");
         }
+    }
+
+    private static List<EPCCertificate> FilterValidCertificates(
+        List<EPCCertificate> certificates,
+        string postcode,
+        ILogger logger
+    )
+    {
+        var validCertificates = new List<EPCCertificate>();
+
+        foreach (var cert in certificates)
+        {
+            if (!cert.Uprn.HasValue)
+            {
+                logger.LogWarning(
+                    "Skipping EPC certificate {CertificateNumber} for postcode {Postcode} because it lacks a UPRN.",
+                    cert.CertificateNumber,
+                    postcode
+                );
+                continue;
+            }
+
+            validCertificates.Add(cert);
+        }
+
+        return validCertificates;
+    }
+
+    private static List<EPCAssessment> MapAndFlagLatestAssessments(
+        List<EPCCertificate> certificates,
+        string postcodeKey
+    )
+    {
+        var now = DateTime.UtcNow.ToInstant();
+
+        var assessments = certificates
+            .Select(c => new EPCAssessment
+            {
+                PostcodeKey = postcodeKey,
+                AddressLine = c.AddressLine1 ?? "No Address Line 1 Found",
+                EPCRating = c.CurrentEnergyEfficiencyBand,
+                RegistrationDate = ParseRegistrationDateToInstant(c.RegistrationDate) ?? now,
+                UpdatedAt = now,
+                UniquePropertyReferenceNumber = c.Uprn!.Value,
+                CertificateNumber = c.CertificateNumber,
+                IsLatest = false,
+            })
+            .ToList();
+
+        var groupedByUprn = assessments.GroupBy(a => a.UniquePropertyReferenceNumber);
+
+        foreach (var group in groupedByUprn)
+        {
+            var latestInGroup = group.OrderByDescending(a => a.RegistrationDate).First();
+            latestInGroup.IsLatest = true;
+        }
+
+        return assessments;
     }
 
     private static Instant? ParseRegistrationDateToInstant(string? dateStr)
