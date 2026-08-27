@@ -11,6 +11,9 @@ import type {
   ProcessPostcodeData,
   ProcessPostcodeErrors,
   ProcessPostcodeResponses,
+  SearchProcessedPostcodesData,
+  SearchProcessedPostcodesErrors,
+  SearchProcessedPostcodesResponses,
 } from "./types.gen";
 
 export type Options<
@@ -44,6 +47,26 @@ export const processPostcode = <ThrowOnError extends boolean = false>(
     ThrowOnError
   >({
     url: "/api/postcodes/process",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+export const searchProcessedPostcodes = <ThrowOnError extends boolean = false>(
+  options: Options<SearchProcessedPostcodesData, ThrowOnError>,
+): RequestResult<
+  SearchProcessedPostcodesResponses,
+  SearchProcessedPostcodesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).post<
+    SearchProcessedPostcodesResponses,
+    SearchProcessedPostcodesErrors,
+    ThrowOnError
+  >({
+    url: "/api/postcodes/processed",
     ...options,
     headers: {
       "Content-Type": "application/json",

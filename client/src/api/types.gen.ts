@@ -4,6 +4,16 @@ export type ClientOptions = {
   baseUrl: `${string}://${string}` | (string & {});
 };
 
+export type DictionaryOfStringAndDecimal = {
+  [key: string]: number;
+};
+
+export type ListOfEpcAssessmentResponse =
+  Array<SearchProcessedPostcodesEpcAssessmentResponse>;
+
+export type ListOfPostcodeResponse =
+  Array<SearchProcessedPostcodesPostcodeResponse>;
+
 /**
  * RFC9457 compatible problem details/ error response class. this can be used by configuring startup like so:
  * ```app.UseFastEndpoints(c =&gt; c.Errors.UseProblemDetails())```
@@ -48,6 +58,51 @@ export type ProcessPostcodeResponse = {
   message: string;
 };
 
+export type SearchProcessedPostcodesEpcAssessmentAggregationResponse = {
+  totalAssessments: number;
+  percentageExpired: number;
+  percentageExpiringInNextYear: number;
+  epcRatingPercentages: DictionaryOfStringAndDecimal;
+};
+
+export type SearchProcessedPostcodesEpcAssessmentResponse = {
+  epcAssessmentId: number;
+  addressLine: string;
+  epcRating: null | string;
+  uniquePropertyReferenceNumber: string;
+  certificateNumber: string;
+  registrationDate: string;
+  isLatest: boolean;
+  isExpired: boolean;
+  isExpiringInNextYear: boolean;
+};
+
+export type SearchProcessedPostcodesLsoaDeprivationResponse = {
+  multipleDeprivationPercentage: number;
+  multipleDeprivationRank: number;
+  incomeDeprivationPercentage: number;
+  incomeDeprivationRank: number;
+  employmentDeprivationPercentage: number;
+  employmentDeprivationRank: number;
+  barriersToHousingAndServicesPercentage: number;
+  barriersToHousingAndServicesRank: number;
+};
+
+export type SearchProcessedPostcodesPostcodeResponse = {
+  postcode: string;
+  lsoaDeprivation: SearchProcessedPostcodesLsoaDeprivationResponse;
+  epcAggregation: SearchProcessedPostcodesEpcAssessmentAggregationResponse;
+  epcAssessments: ListOfEpcAssessmentResponse;
+};
+
+export type SearchProcessedPostcodesRequest = {
+  postcodeSearchTerm: null | string;
+};
+
+export type SearchProcessedPostcodesResponse = {
+  postcodes: ListOfPostcodeResponse;
+};
+
 export type ProcessPostcodeData = {
   body: ProcessPostcodeRequest;
   path?: never;
@@ -82,3 +137,30 @@ export type ProcessPostcodeResponses = {
 
 export type ProcessPostcodeResponse2 =
   ProcessPostcodeResponses[keyof ProcessPostcodeResponses];
+
+export type SearchProcessedPostcodesData = {
+  body: SearchProcessedPostcodesRequest;
+  path?: never;
+  query?: never;
+  url: "/api/postcodes/processed";
+};
+
+export type SearchProcessedPostcodesErrors = {
+  /**
+   * Server Error
+   */
+  500: ProblemDetails;
+};
+
+export type SearchProcessedPostcodesError =
+  SearchProcessedPostcodesErrors[keyof SearchProcessedPostcodesErrors];
+
+export type SearchProcessedPostcodesResponses = {
+  /**
+   * Success
+   */
+  200: SearchProcessedPostcodesResponse;
+};
+
+export type SearchProcessedPostcodesResponse2 =
+  SearchProcessedPostcodesResponses[keyof SearchProcessedPostcodesResponses];

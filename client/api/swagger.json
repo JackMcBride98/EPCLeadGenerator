@@ -64,10 +64,69 @@
           }
         }
       }
+    },
+    "/api/postcodes/processed": {
+      "post": {
+        "tags": [
+          "Postcodes"
+        ],
+        "operationId": "SearchProcessedPostcodes",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchProcessedPostcodes_Request"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchProcessedPostcodes_Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server Error",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "DictionaryOfStringAndDecimal": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "number",
+          "format": "double"
+        }
+      },
+      "ListOfEPCAssessmentResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SearchProcessedPostcodes_EPCAssessmentResponse"
+        }
+      },
+      "ListOfPostcodeResponse": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SearchProcessedPostcodes_PostcodeResponse"
+        }
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -168,6 +227,175 @@
           },
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "SearchProcessedPostcodes_EPCAssessmentAggregationResponse": {
+        "required": [
+          "totalAssessments",
+          "percentageExpired",
+          "percentageExpiringInNextYear",
+          "epcRatingPercentages"
+        ],
+        "type": "object",
+        "properties": {
+          "totalAssessments": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "percentageExpired": {
+            "type": "number",
+            "format": "double"
+          },
+          "percentageExpiringInNextYear": {
+            "type": "number",
+            "format": "double"
+          },
+          "epcRatingPercentages": {
+            "$ref": "#/components/schemas/DictionaryOfStringAndDecimal"
+          }
+        }
+      },
+      "SearchProcessedPostcodes_EPCAssessmentResponse": {
+        "required": [
+          "epcAssessmentId",
+          "addressLine",
+          "epcRating",
+          "uniquePropertyReferenceNumber",
+          "certificateNumber",
+          "registrationDate",
+          "isLatest",
+          "isExpired",
+          "isExpiringInNextYear"
+        ],
+        "type": "object",
+        "properties": {
+          "epcAssessmentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "addressLine": {
+            "type": "string"
+          },
+          "epcRating": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "uniquePropertyReferenceNumber": {
+            "type": "string"
+          },
+          "certificateNumber": {
+            "type": "string"
+          },
+          "registrationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isLatest": {
+            "type": "boolean"
+          },
+          "isExpired": {
+            "type": "boolean"
+          },
+          "isExpiringInNextYear": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SearchProcessedPostcodes_LSOADeprivationResponse": {
+        "required": [
+          "multipleDeprivationPercentage",
+          "multipleDeprivationRank",
+          "incomeDeprivationPercentage",
+          "incomeDeprivationRank",
+          "employmentDeprivationPercentage",
+          "employmentDeprivationRank",
+          "barriersToHousingAndServicesPercentage",
+          "barriersToHousingAndServicesRank"
+        ],
+        "type": "object",
+        "properties": {
+          "multipleDeprivationPercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "multipleDeprivationRank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "incomeDeprivationPercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "incomeDeprivationRank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "employmentDeprivationPercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "employmentDeprivationRank": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "barriersToHousingAndServicesPercentage": {
+            "type": "number",
+            "format": "double"
+          },
+          "barriersToHousingAndServicesRank": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SearchProcessedPostcodes_PostcodeResponse": {
+        "required": [
+          "postcode",
+          "lsoaDeprivation",
+          "epcAggregation",
+          "epcAssessments"
+        ],
+        "type": "object",
+        "properties": {
+          "postcode": {
+            "type": "string"
+          },
+          "lsoaDeprivation": {
+            "$ref": "#/components/schemas/SearchProcessedPostcodes_LSOADeprivationResponse"
+          },
+          "epcAggregation": {
+            "$ref": "#/components/schemas/SearchProcessedPostcodes_EPCAssessmentAggregationResponse"
+          },
+          "epcAssessments": {
+            "$ref": "#/components/schemas/ListOfEPCAssessmentResponse"
+          }
+        }
+      },
+      "SearchProcessedPostcodes_Request": {
+        "required": [
+          "postcodeSearchTerm"
+        ],
+        "type": "object",
+        "properties": {
+          "postcodeSearchTerm": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SearchProcessedPostcodes_Response": {
+        "required": [
+          "postcodes"
+        ],
+        "type": "object",
+        "properties": {
+          "postcodes": {
+            "$ref": "#/components/schemas/ListOfPostcodeResponse"
           }
         }
       }
