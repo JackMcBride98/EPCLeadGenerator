@@ -4,42 +4,6 @@ export type ClientOptions = {
   baseUrl: `${string}://${string}` | (string & {});
 };
 
-export type EpcCertificate = {
-  certificateNumber: string;
-  addressLine1: null | string;
-  addressLine2: null | string;
-  addressLine3: null | string;
-  addressLine4: null | string;
-  postcode: null | string;
-  postTown: null | string;
-  council: null | string;
-  constituency: null | string;
-  currentEnergyEfficiencyBand: null | string;
-  registrationDate: null | string;
-  uprn: null | number;
-  schemaType: null | string;
-};
-
-export type GetPostcodeDeprivationPostcodeDeprivationResponse = {
-  postcode: string;
-  markAsDone: boolean;
-  lsoaCode: null | string;
-  lsoaName: null | string;
-  multipleDeprivationPercentage: null | number;
-  multipleDeprivationDecile: null | number;
-};
-
-export type GetPostcodeDeprivationRequest = {
-  postcode: string;
-};
-
-export type GetPostcodeDeprivationResponse = {
-  data: GetPostcodeDeprivationPostcodeDeprivationResponse | null;
-  epcData: ListOfEpcCertificate | null;
-};
-
-export type ListOfEpcCertificate = Array<EpcCertificate>;
-
 /**
  * RFC9457 compatible problem details/ error response class. this can be used by configuring startup like so:
  * ```app.UseFastEndpoints(c =&gt; c.Errors.UseProblemDetails())```
@@ -74,14 +38,24 @@ export type ProblemDetails = {
   }>;
 };
 
-export type GetPostcodeDeprivationData = {
-  body: GetPostcodeDeprivationRequest;
-  path?: never;
-  query?: never;
-  url: "/api/postcodes/lookup";
+export type ProcessPostcodeRequest = {
+  postcode: string;
+  refreshEPCData?: boolean;
 };
 
-export type GetPostcodeDeprivationErrors = {
+export type ProcessPostcodeResponse = {
+  postcode: string;
+  message: string;
+};
+
+export type ProcessPostcodeData = {
+  body: ProcessPostcodeRequest;
+  path?: never;
+  query?: never;
+  url: "/api/postcodes/process";
+};
+
+export type ProcessPostcodeErrors = {
   /**
    * The requested resource was not found.
    */
@@ -96,15 +70,15 @@ export type GetPostcodeDeprivationErrors = {
   502: ProblemDetails;
 };
 
-export type GetPostcodeDeprivationError =
-  GetPostcodeDeprivationErrors[keyof GetPostcodeDeprivationErrors];
+export type ProcessPostcodeError =
+  ProcessPostcodeErrors[keyof ProcessPostcodeErrors];
 
-export type GetPostcodeDeprivationResponses = {
+export type ProcessPostcodeResponses = {
   /**
    * The request was successful.
    */
-  200: GetPostcodeDeprivationResponse;
+  200: ProcessPostcodeResponse;
 };
 
-export type GetPostcodeDeprivationResponse2 =
-  GetPostcodeDeprivationResponses[keyof GetPostcodeDeprivationResponses];
+export type ProcessPostcodeResponse2 =
+  ProcessPostcodeResponses[keyof ProcessPostcodeResponses];

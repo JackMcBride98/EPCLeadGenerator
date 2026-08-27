@@ -8,9 +8,9 @@ import type {
 } from "./client";
 import { client } from "./client.gen";
 import type {
-  GetPostcodeDeprivationData,
-  GetPostcodeDeprivationErrors,
-  GetPostcodeDeprivationResponses,
+  ProcessPostcodeData,
+  ProcessPostcodeErrors,
+  ProcessPostcodeResponses,
 } from "./types.gen";
 
 export type Options<
@@ -31,19 +31,19 @@ export type Options<
   meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
 
-export const getPostcodeDeprivation = <ThrowOnError extends boolean = false>(
-  options: Options<GetPostcodeDeprivationData, ThrowOnError>,
+export const processPostcode = <ThrowOnError extends boolean = false>(
+  options: Options<ProcessPostcodeData, ThrowOnError>,
 ): RequestResult<
-  GetPostcodeDeprivationResponses,
-  GetPostcodeDeprivationErrors,
+  ProcessPostcodeResponses,
+  ProcessPostcodeErrors,
   ThrowOnError
 > =>
   (options.client ?? client).post<
-    GetPostcodeDeprivationResponses,
-    GetPostcodeDeprivationErrors,
+    ProcessPostcodeResponses,
+    ProcessPostcodeErrors,
     ThrowOnError
   >({
-    url: "/api/postcodes/lookup",
+    url: "/api/postcodes/process",
     ...options,
     headers: {
       "Content-Type": "application/json",
