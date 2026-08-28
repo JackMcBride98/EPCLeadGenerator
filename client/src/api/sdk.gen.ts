@@ -55,21 +55,14 @@ export const processPostcode = <ThrowOnError extends boolean = false>(
   });
 
 export const searchProcessedPostcodes = <ThrowOnError extends boolean = false>(
-  options: Options<SearchProcessedPostcodesData, ThrowOnError>,
+  options?: Options<SearchProcessedPostcodesData, ThrowOnError>,
 ): RequestResult<
   SearchProcessedPostcodesResponses,
   SearchProcessedPostcodesErrors,
   ThrowOnError
 > =>
-  (options.client ?? client).post<
+  (options?.client ?? client).get<
     SearchProcessedPostcodesResponses,
     SearchProcessedPostcodesErrors,
     ThrowOnError
-  >({
-    url: "/api/postcodes/processed",
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-  });
+  >({ url: "/api/postcodes/processed", ...options });

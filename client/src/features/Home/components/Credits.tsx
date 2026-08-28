@@ -6,25 +6,21 @@ export const Credits = () => {
       <div className="">
         Created by{" "}
         <a
-          href="https://portfolio-jackmcbride.vercel.app/"
+          href="https://portfolio.jackmcbride.dev/"
           rel="noopener noreferrer"
           target="_blank"
-          className="text-violet-600"
+          className="text-link-green"
         >
           Jack McBride
         </a>
       </div>
       <a
-        href="https://github.com/JackMcBride98/JackTemplate"
+        href="https://github.com/JackMcBride98/EPCLeadGenerator"
         rel="noopener noreferrer"
         target="_blank"
         className="mx-auto mb-4"
       >
-        <img
-          src={githubLogo}
-          alt="Github"
-          className="mt-2 h-8 w-8 invert"
-        ></img>
+        <img src={githubLogo} alt="Github" className="mt-2 h-8 w-8" />
       </a>
     </div>
   );

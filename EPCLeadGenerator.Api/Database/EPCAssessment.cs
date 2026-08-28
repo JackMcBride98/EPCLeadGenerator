@@ -33,7 +33,7 @@ public class EPCAssessment
     public bool IsLatest { get; set; }
 
     [MaxLength(24)]
-    public string CertificateNumber { get; set; }
+    public string CertificateNumber { get; set; } = null!;
 
     [ForeignKey(nameof(PostcodeKey))]
     public Postcode Postcode { get; set; } = null!;

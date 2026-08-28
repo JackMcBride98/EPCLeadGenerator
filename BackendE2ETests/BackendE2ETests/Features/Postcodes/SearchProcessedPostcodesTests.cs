@@ -54,7 +54,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(postcodeKey);
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -168,7 +168,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(postcodeKey);
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -288,7 +288,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(postcodeKey);
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -335,7 +335,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(postcodeKey);
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -429,7 +429,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(postcodeKey);
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -491,7 +491,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(PostcodeSearchTerm: null);
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -537,7 +537,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(PostcodeSearchTerm: "bs1");
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response
@@ -602,7 +602,7 @@ public class SearchProcessedPostcodesTests(App app) : TestBase(app)
         var request = new SearchProcessedPostcodes.Request(PostcodeSearchTerm: "BS1");
 
         // Act
-        var (response, result) = await App.Client.POSTAsync<
+        var (response, result) = await App.Client.GETAsync<
             SearchProcessedPostcodes.Endpoint,
             SearchProcessedPostcodes.Request,
             SearchProcessedPostcodes.Response

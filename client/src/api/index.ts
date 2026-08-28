@@ -25,7 +25,6 @@ export type {
   SearchProcessedPostcodesErrors,
   SearchProcessedPostcodesLsoaDeprivationResponse,
   SearchProcessedPostcodesPostcodeResponse,
-  SearchProcessedPostcodesRequest,
   SearchProcessedPostcodesResponse,
   SearchProcessedPostcodesResponse2,
   SearchProcessedPostcodesResponses,

@@ -66,24 +66,26 @@
       }
     },
     "/api/postcodes/processed": {
-      "post": {
+      "get": {
         "tags": [
           "Postcodes"
         ],
         "operationId": "SearchProcessedPostcodes",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SearchProcessedPostcodes_Request"
-              }
+        "parameters": [
+          {
+            "name": "postcodeSearchTerm",
+            "in": "query",
+            "schema": {
+              "type": [
+                "null",
+                "string"
+              ]
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "The processed postcodes were retrieved successfully.",
             "content": {
               "application/json": {
                 "schema": {
@@ -92,8 +94,18 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request - Invalid request payload.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "500": {
-            "description": "Server Error",
+            "description": "An internal server error occurred.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -354,6 +366,7 @@
       "SearchProcessedPostcodes_PostcodeResponse": {
         "required": [
           "postcode",
+          "epCsLastUpdatedAt",
           "lsoaDeprivation",
           "epcAggregation",
           "epcAssessments"
@@ -361,6 +374,9 @@
         "type": "object",
         "properties": {
           "postcode": {
+            "type": "string"
+          },
+          "epCsLastUpdatedAt": {
             "type": "string"
           },
           "lsoaDeprivation": {
@@ -371,20 +387,6 @@
           },
           "epcAssessments": {
             "$ref": "#/components/schemas/ListOfEPCAssessmentResponse"
-          }
-        }
-      },
-      "SearchProcessedPostcodes_Request": {
-        "required": [
-          "postcodeSearchTerm"
-        ],
-        "type": "object",
-        "properties": {
-          "postcodeSearchTerm": {
-            "type": [
-              "null",
-              "string"
-            ]
           }
         }
       },
