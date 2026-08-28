@@ -1,5 +1,5 @@
 import { ProcessPostcode } from "@features/Home/components/ProcessPostcode.tsx";
-import { ProcessedPostcodes } from "@features/Home/components/ProcessedPostcodes.tsx";
+import { ProcessedPostcodes } from "@features/Home/components/ProcessedPostcodes/ProcessedPostcodes.tsx";
 import { Credits } from "./components/Credits.tsx";
 
 export const Home = () => {

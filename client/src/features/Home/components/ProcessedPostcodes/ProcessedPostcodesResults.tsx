@@ -2,25 +2,7 @@
   ProblemDetails,
   SearchProcessedPostcodesPostcodeResponse,
 } from "@api/types.gen.ts";
-import { formatDate } from "@helpers/dateHelpers.ts";
-
-interface ProcessedPostcodeItemProps {
-  postcode: SearchProcessedPostcodesPostcodeResponse;
-}
-
-export const ProcessedPostcode = ({ postcode }: ProcessedPostcodeItemProps) => {
-  return (
-    <li className="flex items-center justify-between p-4 transition-colors hover:bg-gray-50">
-      <div>
-        <p className="font-semibold text-gray-900">{postcode.postcode}</p>
-        <p className="text-xs text-gray-500">EPCs last fetched at </p>
-        <p className="text-xs text-gray-500">
-          {formatDate(postcode.epCsLastUpdatedAt)}
-        </p>
-      </div>
-    </li>
-  );
-};
+import { ProcessedPostcode } from "@features/Home/components/ProcessedPostcodes/ProcessedPostcode.tsx";
 
 interface ProcessedPostcodesListProps {
   isLoading: boolean;
@@ -30,7 +12,7 @@ interface ProcessedPostcodesListProps {
   searchTerm: string;
 }
 
-export const ProcessedPostcodesList = ({
+export const ProcessedPostcodesResults = ({
   isLoading,
   isError,
   error,

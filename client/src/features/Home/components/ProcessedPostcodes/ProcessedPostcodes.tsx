@@ -1,5 +1,5 @@
 ﻿import { searchProcessedPostcodesOptions } from "@api/@tanstack/react-query.gen.ts";
-import { ProcessedPostcodesList } from "@features/Home/components/ProcessedPostcodesResults.tsx";
+import { ProcessedPostcodesResults } from "@features/Home/components/ProcessedPostcodes/ProcessedPostcodesResults.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -18,7 +18,7 @@ export const ProcessedPostcodes = () => {
         value={postcodeSearchTerm}
         onChange={setPostcodeSearchTerm}
       />
-      <ProcessedPostcodesList
+      <ProcessedPostcodesResults
         isLoading={isPending}
         isError={isError}
         error={error}
