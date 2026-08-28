@@ -1,4 +1,5 @@
 ﻿import type { SearchProcessedPostcodesPostcodeResponse } from "@api/types.gen.ts";
+import { EPCAggregationDisplay } from "@features/Home/components/ProcessedPostcodes/EPCAggregationDisplay.tsx";
 import { formatDate } from "@helpers/dateHelpers.ts";
 import { LSOADeprivationDisplay } from "./LSOADeprivationDisplay.tsx";
 
@@ -20,9 +21,9 @@ export const ProcessedPostcode = ({ postcode }: ProcessedPostcodeItemProps) => {
         </div>
       </div>
 
-      {postcode.lsoaDeprivation && (
-        <LSOADeprivationDisplay deprivation={postcode.lsoaDeprivation} />
-      )}
+      <LSOADeprivationDisplay deprivation={postcode.lsoaDeprivation} />
+
+      <EPCAggregationDisplay aggregation={postcode.epcAggregation} />
     </li>
   );
 };
