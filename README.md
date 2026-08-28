@@ -99,9 +99,13 @@ Then go to Webhook automation and copy the webhook automation url for github and
 called `COOLIFY_WEBHOOK_API`
 
 Then create the Migrations resource in the same way, set the database connection string environment variable
-and setup the `COOLIFY_WEBHOOK_MIGRATIONS`
+and setup the `COOLIFY_WEBHOOK_MIGRATION`
 
 In the github action file `.github/workflows/coolify-deploy.yml` make sure to set the registry to the right thing. ghcr.io registry for said repo
+
+Set the repo secret for COOLIFY_TOKEN this is the one from coolify, give it read and deploy rights.
+
+Update the entrypoints in the docker files to point to the correct .dll's
 
 Now commit that change and manually run the deploy step and pray it works XD
 

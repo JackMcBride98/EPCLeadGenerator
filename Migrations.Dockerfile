@@ -1,4 +1,4 @@
 ﻿FROM mcr.microsoft.com/dotnet/runtime:10.0 AS final
 WORKDIR /app
 COPY ./publish-migrations .
-ENTRYPOINT ["dotnet", "JackTemplate.Database.dll"]
+ENTRYPOINT ["dotnet", "EPCLeadGenerator.Database.dll"]

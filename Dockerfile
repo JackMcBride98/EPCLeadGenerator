@@ -3,4 +3,4 @@ WORKDIR /app
 COPY ./publish .
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://0.0.0.0:8080
-ENTRYPOINT ["dotnet", "JackTemplate.Api.dll"]
+ENTRYPOINT ["dotnet", "EPCLeadGenerator.Api.dll"]
