@@ -103,9 +103,11 @@ and setup the `COOLIFY_WEBHOOK_MIGRATION`
 
 In the github action file `.github/workflows/coolify-deploy.yml` make sure to set the registry to the right thing. ghcr.io registry for said repo
 
-Set the repo secret for COOLIFY_TOKEN this is the one from coolify, give it read and deploy rights.
+Set the repo secret for COOLIFY_TOKEN this is the one from coolify, give it read and deploy rights if creating a new one.
 
 Update the entrypoints in the docker files to point to the correct .dll's
+
+Update the port that the api coolify resource exposes is to 8080 to match what the .NET dll is doing
 
 Now commit that change and manually run the deploy step and pray it works XD
 
