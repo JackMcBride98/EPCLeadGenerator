@@ -82,5 +82,4 @@ who you want to be signed in with when using tofu locally.
 
 # TODO
 - Create endpoint to mark Postcodes as Done?
-- Create frontend page to display the data for a given postcode
 - Host on coolify

@@ -26,7 +26,13 @@ export const Home = () => {
         to analyse given Postcodes suitability for energy performance
         certificates.
       </p>
-      <ProcessPostcode />
+      <div className="flex items-center gap-4">
+        <ProcessPostcode />
+        <p className="w-80">
+          Bulk process postcodes by district e.g. BS7 / BS8 To Be Implemented.
+          Need to be careful with this to avoid rate limits.
+        </p>
+      </div>
       <ProcessedPostcodes />
       <Credits />
     </div>

@@ -14,10 +14,19 @@ export const ProcessedPostcodes = () => {
 
   return (
     <div className="mx-auto w-full space-y-4 p-4">
-      <PostcodeSearchInput
-        value={postcodeSearchTerm}
-        onChange={setPostcodeSearchTerm}
-      />
+      <div className="flex w-full items-end gap-8">
+        <PostcodeSearchInput
+          value={postcodeSearchTerm}
+          onChange={setPostcodeSearchTerm}
+        />
+        <p>
+          For Deprivation Percentages, high percentage = low deprivation, low
+          percentage = high deprivation. There are 35,672 LSOAs in the UK, the
+          percentage is calculated as rank / total . 1st being the most deprived
+          area in the UK and 35,672nd being the least TODO: Add filters,
+          pagination and sorting!
+        </p>
+      </div>
       <ProcessedPostcodesResults
         isLoading={isPending}
         isError={isError}
