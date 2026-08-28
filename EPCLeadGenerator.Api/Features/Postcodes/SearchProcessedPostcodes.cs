@@ -107,7 +107,8 @@ public class SearchProcessedPostcodes
                         .ToList(),
 
                     Assessments = p
-                        .EPCAssessments.Select(a => new EPCAssessmentResponse(
+                        .EPCAssessments.OrderBy(a => a.UniquePropertyReferenceNumber)
+                        .Select(a => new EPCAssessmentResponse(
                             a.EPCAssessmentId,
                             a.AddressLine,
                             a.EPCRating,
@@ -126,7 +127,7 @@ public class SearchProcessedPostcodes
                 processedPostcodes
                     .Select(p => new PostcodeResponse(
                         p.PostcodeKey,
-                        p.EPCsLastUpdatedAtString,
+                        p.EPCsLastUpdatedAtString!,
                         new LSOADeprivationResponse(
                             p.LSOA!.MultipleDeprivationPercentage,
                             p.LSOA.MultipleDeprivationRank,

@@ -5,7 +5,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BASE: "jackmcbride98/jacktemplate"
+  IMAGE_BASE: "jackmcbride98/epcleadgenerator"
 
 jobs:
   build-and-deploy:

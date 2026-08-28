@@ -80,7 +80,40 @@ tofu plan
 https://687979656894.signin.aws.amazon.com/console - console sign in link for playlist-search-tool-admin. This is
 who you want to be signed in with when using tofu locally.
 
+# Coolify deployment
+Steps to do the coolify deployment
+
+Create a new Coolify project from the dashboard
+
+Create a PostgreSQL resource for the database 
+Under the general tab of the Database settings find Postgres URL (internal) - convert this into HOST=, PORT= connection string
+This will be the database connection string which you will need to set as an environment variable later for the migrations and api resources
+
+Create a Docker Image resource for the API
+Name things well and set the image to point at ghcr.io/jackmcbride98/{lowercase repo name}-api
+
+Set environment variables for the database connection string use port 5432 and the password from coolify dashbord for the 
+postgres instance you made
+
+Then go to Webhook automation and copy the webhook automation url for github and add that as a repository project secret for github actions
+called `COOLIFY_WEBHOOK_API`
+
+Then create the Migrations resource in the same way, set the database connection string environment variable
+and setup the `COOLIFY_WEBHOOK_MIGRATION`
+
+In the github action file `.github/workflows/coolify-deploy.yml` make sure to set the registry to the right thing. ghcr.io registry for said repo
+
+Set the repo secret for COOLIFY_TOKEN this is the one from coolify, give it read and deploy rights if creating a new one.
+
+Update the entrypoints in the docker files to point to the correct .dll's
+
+Update the port that the api coolify resource exposes is to 8080 to match what the .NET dll is doing
+
+Now commit that change and manually run the deploy step and pray it works XD
+
+Can setup domains in Route53 on amazon and in coolify after once done.
+
+
 # TODO
 - Create endpoint to mark Postcodes as Done?
-- Create frontend page to display the data for a given postcode
 - Host on coolify
