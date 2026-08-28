@@ -90,13 +90,10 @@ export type SearchProcessedPostcodesLsoaDeprivationResponse = {
 
 export type SearchProcessedPostcodesPostcodeResponse = {
   postcode: string;
+  epCsLastUpdatedAt: string;
   lsoaDeprivation: SearchProcessedPostcodesLsoaDeprivationResponse;
   epcAggregation: SearchProcessedPostcodesEpcAssessmentAggregationResponse;
   epcAssessments: ListOfEpcAssessmentResponse;
-};
-
-export type SearchProcessedPostcodesRequest = {
-  postcodeSearchTerm: null | string;
 };
 
 export type SearchProcessedPostcodesResponse = {
@@ -139,15 +136,21 @@ export type ProcessPostcodeResponse2 =
   ProcessPostcodeResponses[keyof ProcessPostcodeResponses];
 
 export type SearchProcessedPostcodesData = {
-  body: SearchProcessedPostcodesRequest;
+  body?: never;
   path?: never;
-  query?: never;
+  query?: {
+    postcodeSearchTerm?: null | string;
+  };
   url: "/api/postcodes/processed";
 };
 
 export type SearchProcessedPostcodesErrors = {
   /**
-   * Server Error
+   * Bad Request - Invalid request payload.
+   */
+  400: ProblemDetails;
+  /**
+   * An internal server error occurred.
    */
   500: ProblemDetails;
 };
@@ -157,7 +160,7 @@ export type SearchProcessedPostcodesError =
 
 export type SearchProcessedPostcodesResponses = {
   /**
-   * Success
+   * The processed postcodes were retrieved successfully.
    */
   200: SearchProcessedPostcodesResponse;
 };

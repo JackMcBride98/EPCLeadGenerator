@@ -9,11 +9,18 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-  *,
+  *, 
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
+}
+
+@theme {
+  --color-primary: #00ff8c;
+  --color-link-green: #00cd71;
+  --color-dark-green: #00864a;
+  --color-dull: #eeeeee;
 }

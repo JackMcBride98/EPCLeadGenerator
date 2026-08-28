@@ -15,6 +15,7 @@ public class SearchProcessedPostcodes
 
     public record PostcodeResponse(
         string Postcode,
+        string EPCsLastUpdatedAt,
         LSOADeprivationResponse LSOADeprivation,
         EPCAssessmentAggregationResponse EPCAggregation,
         List<EPCAssessmentResponse> EPCAssessments
@@ -54,8 +55,17 @@ public class SearchProcessedPostcodes
     {
         public override void Configure()
         {
-            Post("/postcodes/processed");
+            Get("/postcodes/processed");
             AllowAnonymous();
+
+            Description(b => b.ProducesProblemDetails(400).ProducesProblemDetails(500));
+
+            Summary(s =>
+            {
+                s.Responses[200] = "The processed postcodes were retrieved successfully.";
+                s.Responses[400] = "Bad Request - Invalid request payload.";
+                s.Responses[500] = "An internal server error occurred.";
+            });
         }
 
         public override async Task<Response> ExecuteAsync(Request req, CancellationToken ct)
@@ -74,6 +84,8 @@ public class SearchProcessedPostcodes
                 .Select(p => new
                 {
                     p.PostcodeKey,
+                    EPCsLastUpdatedAtString = p.EPCsLastUpdatedAt.ToString(),
+
                     LSOA = p.LSOADeprivation,
 
                     TotalCount = p.EPCAssessments.Count(a => a.IsLatest),
@@ -114,6 +126,7 @@ public class SearchProcessedPostcodes
                 processedPostcodes
                     .Select(p => new PostcodeResponse(
                         p.PostcodeKey,
+                        p.EPCsLastUpdatedAtString,
                         new LSOADeprivationResponse(
                             p.LSOA!.MultipleDeprivationPercentage,
                             p.LSOA.MultipleDeprivationRank,
