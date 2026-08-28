@@ -20,11 +20,7 @@ export const Credits = () => {
         target="_blank"
         className="mx-auto mb-4"
       >
-        <img
-          src={githubLogo}
-          alt="Github"
-          className="mt-2 h-8 w-8"
-        ></img>
+        <img src={githubLogo} alt="Github" className="mt-2 h-8 w-8" />
       </a>
     </div>
   );
