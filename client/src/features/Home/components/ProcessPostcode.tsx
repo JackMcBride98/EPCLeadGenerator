@@ -1,10 +1,19 @@
-﻿import { processPostcodeMutation } from "@api/@tanstack/react-query.gen.ts";
+﻿import {
+  processPostcodeMutation,
+  searchProcessedPostcodesQueryKey,
+} from "@api/@tanstack/react-query.gen.ts";
 import { SearchBar } from "@features/Home/components/SearchBar.tsx";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const ProcessPostcode = () => {
+  const queryClient = useQueryClient();
   const { mutate, isPending, isError, error, data } = useMutation({
     ...processPostcodeMutation(),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: searchProcessedPostcodesQueryKey({}),
+      });
+    },
   });
 
   const handleSearch = (postcode: string) => {

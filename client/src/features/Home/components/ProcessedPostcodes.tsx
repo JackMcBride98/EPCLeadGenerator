@@ -13,7 +13,7 @@ export const ProcessedPostcodes = () => {
   });
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-4 p-4">
+    <div className="mx-auto w-full space-y-4 p-4">
       <PostcodeSearchInput
         value={postcodeSearchTerm}
         onChange={setPostcodeSearchTerm}
@@ -51,7 +51,7 @@ export const PostcodeSearchInput = ({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder="Search postcodes (e.g. SW1A)..."
-      className="focus:border-link-green focus:ring-link-green w-full rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:ring-1 focus:outline-none"
+      className="focus:border-link-green focus:ring-link-green w-80 rounded-md border border-gray-300 px-4 py-2 text-sm shadow-sm focus:ring-1 focus:outline-none"
     />
   </div>
 );
